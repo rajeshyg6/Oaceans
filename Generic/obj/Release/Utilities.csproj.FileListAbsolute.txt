@@ -1,0 +1,5 @@
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Generic\bin\Release\Generic.dll
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Generic\bin\Release\Generic.pdb
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Generic\obj\Release\Utilities.csprojResolveAssemblyReference.cache
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Generic\obj\Release\Generic.dll
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Generic\obj\Release\Generic.pdb
