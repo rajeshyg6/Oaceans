@@ -1,5 +1,0 @@
-C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Monitory\bin\Release\Monitory.dll
-C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Monitory\bin\Release\Monitory.pdb
-C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Monitory\obj\Release\Monitory.dll
-C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Monitory\obj\Release\Monitory.pdb
-C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Monitory\obj\Release\Monitory.csprojResolveAssemblyReference.cache

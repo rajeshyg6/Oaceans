@@ -6,11 +6,38 @@ using System.Threading.Tasks;
 
 namespace RDeepCore
 {
+    public enum PositonTypeCategory
+    {
+        Straight,
+        Even,
+        Third
+    }
+
+    public enum PositonTypeSubCategory
+    {
+        Straight,
+        Color,
+        OddEven,
+        LowHigh,
+        Dozen,
+        Column
+    }
+
     public enum PositonType
     {
+        Straight,
+        Red,
+        Black,
+        Odd,
         Even,
-        Third,
-        Straight
+        Low,
+        High,
+        FirstDozen,
+        SecondDozen,
+        ThirdDozen,
+        FirstColumn,
+        SecondColumn,
+        ThirdColumn
     }
 
     public class RDeepPositions
@@ -103,10 +130,110 @@ namespace RDeepCore
             return result;
         }
 
-        internal static int[] GetNumberPositions()
+        internal static IEnumerable<int> PositionNumbers()
         {
-            int[] result;
-            result = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37 };
+            return PositionNumbersByType(PositonType.Straight);
+        }
+
+        internal static IEnumerable<int> PositionNumbersByType(PositonType positionType)
+        {
+            List<int> result = new List<int>();
+
+            switch (positionType)
+            {
+                case PositonType.Straight:
+                    foreach (RDeepPosition pos in rDeepPositions)
+                    {
+                        if (pos.isWheelNumber == true)
+                            result.Add(pos.ID);
+                    }
+                    break;
+                case PositonType.Red:
+                    foreach (RDeepPosition pos in rDeepPositions)
+                    {
+                        if (pos.isRed == true)
+                            result.Add(pos.ID);
+                    }
+                    break;
+                case PositonType.Black:
+                    foreach (RDeepPosition pos in rDeepPositions)
+                    {
+                        if (pos.isBlack == true)
+                            result.Add(pos.ID);
+                    }
+                    break;
+                case PositonType.Even:
+                    foreach (RDeepPosition pos in rDeepPositions)
+                    {
+                        if (pos.isEven == true)
+                            result.Add(pos.ID);
+                    }
+                    break;
+                case PositonType.Odd:
+                    foreach (RDeepPosition pos in rDeepPositions)
+                    {
+                        if (pos.isOdd == true)
+                            result.Add(pos.ID);
+                    }
+                    break;
+                case PositonType.Low:
+                    foreach (RDeepPosition pos in rDeepPositions)
+                    {
+                        if (pos.isLow == true)
+                            result.Add(pos.ID);
+                    }
+                    break;
+                case PositonType.High:
+                    foreach (RDeepPosition pos in rDeepPositions)
+                    {
+                        if (pos.isHigh == true)
+                            result.Add(pos.ID);
+                    }
+                    break;
+                case PositonType.FirstDozen:
+                    foreach (RDeepPosition pos in rDeepPositions)
+                    {
+                        if (pos.isFirstDozen == true)
+                            result.Add(pos.ID);
+                    }
+                    break;
+                case PositonType.SecondDozen:
+                    foreach (RDeepPosition pos in rDeepPositions)
+                    {
+                        if (pos.isSecondDozen == true)
+                            result.Add(pos.ID);
+                    }
+                    break;
+                case PositonType.ThirdDozen:
+                    foreach (RDeepPosition pos in rDeepPositions)
+                    {
+                        if (pos.isThirdDozen == true)
+                            result.Add(pos.ID);
+                    }
+                    break;
+                case PositonType.FirstColumn:
+                    foreach (RDeepPosition pos in rDeepPositions)
+                    {
+                        if (pos.isFirstColumn == true)
+                            result.Add(pos.ID);
+                    }
+                    break;
+                case PositonType.SecondColumn:
+                    foreach (RDeepPosition pos in rDeepPositions)
+                    {
+                        if (pos.isSecondColumn == true)
+                            result.Add(pos.ID);
+                    }
+                    break;
+                case PositonType.ThirdColumn:
+                    foreach (RDeepPosition pos in rDeepPositions)
+                    {
+                        if (pos.isThirdColumn == true)
+                            result.Add(pos.ID);
+                    }
+                    break;
+            }
+
             return result;
         }
 
