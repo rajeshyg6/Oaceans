@@ -7,3 +7,12 @@ C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Casino\Participants\obj\
 C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Casino\Participants\obj\Debug\Participants.pdb
 C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Casino\Participants\bin\Debug\Monitory.dll
 C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Casino\Participants\bin\Debug\Monitory.pdb
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Participants\bin\Debug\Participants.dll
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Participants\bin\Debug\Participants.pdb
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Participants\bin\Debug\Generic.dll
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Participants\bin\Debug\Monitory.dll
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Participants\bin\Debug\Generic.pdb
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Participants\bin\Debug\Monitory.pdb
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Participants\obj\Debug\Participants.csprojResolveAssemblyReference.cache
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Participants\obj\Debug\Participants.dll
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Participants\obj\Debug\Participants.pdb

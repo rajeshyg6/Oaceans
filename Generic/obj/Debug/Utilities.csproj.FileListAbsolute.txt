@@ -3,3 +3,8 @@ C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Casino\Generic\bin\Debug
 C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Casino\Generic\obj\Debug\Generic.dll
 C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Casino\Generic\obj\Debug\Generic.pdb
 C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Casino\Generic\obj\Debug\Utilities.csprojResolveAssemblyReference.cache
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Generic\bin\Debug\Generic.dll
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Generic\bin\Debug\Generic.pdb
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Generic\obj\Debug\Utilities.csprojResolveAssemblyReference.cache
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Generic\obj\Debug\Generic.dll
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\Generic\obj\Debug\Generic.pdb
