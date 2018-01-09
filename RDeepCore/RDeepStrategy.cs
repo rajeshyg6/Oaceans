@@ -48,8 +48,8 @@ namespace RDeepCore
 
         private void SetProbabilityUpgradeFactors()
         {
-            probabilityUpgradeFactors.Add(PositonTypeCategory.Even, new List<int> { -5, -5, -5 });
-            probabilityUpgradeFactors.Add(PositonTypeCategory.Third, new List<int> { 0, 0, 0, 0, 0, 5, 6, 7, 8, 9, 10, 11, 12, 13 });
+            probabilityUpgradeFactors.Add(PositonTypeCategory.Even, new List<int> { -5, 0, 0, 8, 2, 1, 1, 1, 1, 1 });
+            probabilityUpgradeFactors.Add(PositonTypeCategory.Third, new List<int> { -2, +2, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 });
             probabilityUpgradeFactors.Add(PositonTypeCategory.Straight, new List<int> { 1 });
         }
 
