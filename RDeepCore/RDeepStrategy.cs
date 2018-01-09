@@ -16,7 +16,6 @@ namespace RDeepCore
         List<BetTypeCategory> betTypeCategories { get; set; }
         int StopAtLossPct { get; set; }
         int WalkAwayAtProfitPct { get; set; }
-
         int EvaluateBetAmount(RDeepBoard board, RDeepPlayer player);
     }
 
@@ -28,18 +27,14 @@ namespace RDeepCore
     class BetByTenFifteenStrategy : IRDeepStrategy
     {
         Dictionary<int, float> probabilities;
+        Dictionary<PositonTypeCategory, List<int>> probabilityUpgradeFactors;
+
         IEnumerable<RDeepPosition> wheelNumbers;
 
         public BetByTenFifteenStrategy()
         {
-            probabilities = new Dictionary<int, float>();
-
-            wheelNumbers = RDeepPositions.rDeepPositions.Where(num => num.isWheelNumber == true);
-
-            foreach (RDeepPosition number in wheelNumbers)
-            {
-                probabilities.Add(number.ID, number.defaultProbability);
-            }
+            SetDefaultProbabilities();
+            SetProbabilityUpgradeFactors();
         }
 
         public IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<int> LastNumbers)
@@ -49,6 +44,25 @@ namespace RDeepCore
             UpdateProbabilities(LastNumbers);
 
             return result;
+        }
+
+        private void SetProbabilityUpgradeFactors()
+        {
+            probabilityUpgradeFactors.Add(PositonTypeCategory.Even, new List<int> { -5, -5, -5 });
+            probabilityUpgradeFactors.Add(PositonTypeCategory.Third, new List<int> { 0, 0, 0, 0, 0, 5, 6, 7, 8, 9, 10, 11, 12, 13 });
+            probabilityUpgradeFactors.Add(PositonTypeCategory.Straight, new List<int> { 1 });
+        }
+
+        private void SetDefaultProbabilities()
+        {
+            probabilities = new Dictionary<int, float>();
+
+            wheelNumbers = RDeepPositions.rDeepPositions.Where(num => num.isWheelNumber == true);
+
+            foreach (RDeepPosition number in wheelNumbers)
+            {
+                probabilities.Add(number.ID, number.defaultProbability);
+            }
         }
 
         private void UpdateProbabilities(List<int> LastNumbers)

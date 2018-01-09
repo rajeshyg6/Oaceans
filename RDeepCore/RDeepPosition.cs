@@ -274,7 +274,6 @@ namespace RDeepCore
     {
         public int ID { get; set; }
         public string Name { get; set; }
-        public PositonType positionType { get; set; }
         public bool isWheelNumber { get; set; }
         public bool isRed { get; set; }
         public bool isBlack { get; set; }
