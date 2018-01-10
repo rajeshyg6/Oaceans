@@ -13,7 +13,7 @@ namespace RDeepCore
         Third
     }
 
-    public enum PositonTypeSubCategory
+    public enum PositionTypeSubCategory
     {
         Straight,
         Color,

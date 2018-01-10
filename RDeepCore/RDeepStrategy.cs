@@ -21,7 +21,7 @@ namespace RDeepCore
 
     interface IRDeepStrategy
     {
-        IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<int> LastNumbers);
+        IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<RDeepPosition> LastNumbers);
     }
 
     class BetByTenFifteenStrategy : IRDeepStrategy
@@ -34,10 +34,13 @@ namespace RDeepCore
         public BetByTenFifteenStrategy()
         {
             probabilities = new Dictionary<int, float>();
+
+            wheelNumbers = RDeepPositions.rDeepPositions.Where(num => num.isWheelNumber == true);
+
             SetProbabilityUpgradeFactorsOnHit();
         }
 
-        public IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<int> LastNumbers)
+        public IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<RDeepPosition> LastNumbers)
         {
             List<RDeepBet> result = new List<RDeepBet>();
 
@@ -56,28 +59,95 @@ namespace RDeepCore
 
         private void SetDefaultProbabilities()
         {
-            wheelNumbers = RDeepPositions.rDeepPositions.Where(num => num.isWheelNumber == true);
-
             foreach (RDeepPosition number in wheelNumbers)
             {
                 probabilities.Add(number.ID, number.defaultProbability);
             }
         }
 
-        private void UpdateProbabilities(List<int> LastNumbers)
+        private void UpdateProbabilities(List<RDeepPosition> LastNumbers)
         {
             SetDefaultProbabilities();
 
-            RDeepPosition currentPos = RDeepPositions.GetPositionByID(LastNumbers[LastNumbers.Count - 1]);
-            foreach(RDeepPosition number in wheelNumbers)
+            RDeepPosition currentPos = LastNumbers[LastNumbers.Count - 1];
+            foreach(PositionTypeSubCategory category in Enum.GetValues(typeof(PositionTypeSubCategory)))
             {
-                //probabilities[number.ID] = 
+                UpdateProbabilitiesByPosType(category, LastNumbers);
             }
         }
 
-        private void UpdateProbabilitiesByPosType(PositonType posType)
+        private void UpdateProbabilitiesByPosType(PositionTypeSubCategory category, List<RDeepPosition> LastNumbers)
         {
+            int HitCount = 1;
+            if (category != PositionTypeSubCategory.Straight)
+                HitCount = GetPositionTypeHitCount(category, LastNumbers);
+        }
 
+        private int GetPositionTypeHitCount(PositionTypeSubCategory category, List<RDeepPosition> LastNumbers)
+        {
+            int result = 1;
+
+            PositonType LastPositionType = PositonType.Straight;
+            PositonType CurrentPositionType = PositonType.Straight;
+
+            for (int index = LastNumbers.Count - 1; index >= 0; index--)
+            {
+                CurrentPositionType = GetPositionType(category, LastNumbers[index]);
+
+                if (LastPositionType == CurrentPositionType)
+                    result++;
+                else
+                    break;
+
+                LastPositionType = CurrentPositionType;
+            }
+
+            return result;
+        }
+
+        private PositonType GetPositionType(PositionTypeSubCategory category, RDeepPosition pos)
+        {
+            if (category == PositionTypeSubCategory.Color)
+            {
+                if (pos.isRed)
+                    return PositonType.Red;
+                else
+                    return PositonType.Black;
+            }
+            else if (category == PositionTypeSubCategory.OddEven)
+            {
+                if (pos.isEven)
+                    return PositonType.Even;
+                else
+                    return PositonType.Odd;
+            }
+            else if (category == PositionTypeSubCategory.LowHigh)
+            {
+                if (pos.isLow)
+                    return PositonType.Low;
+                else
+                    return PositonType.High;
+            }
+            else if (category == PositionTypeSubCategory.Dozen)
+            {
+                if (pos.isFirstDozen)
+                    return PositonType.FirstDozen;
+                else if (pos.isSecondDozen)
+                    return PositonType.SecondDozen;
+                else
+                    return PositonType.ThirdDozen;
+            }
+            else if (category == PositionTypeSubCategory.Column)
+            {
+                if (pos.isFirstColumn)
+                    return PositonType.FirstColumn;
+                else if (pos.isSecondColumn)
+                    return PositonType.SecondColumn;
+                else
+                    return PositonType.ThirdColumn;
+            }
+            else
+                return PositonType.Straight;
         }
 
         private PositonTypeCategory GetPositonTypeCategory(PositonType posType)
@@ -97,7 +167,7 @@ namespace RDeepCore
 
     class RandomRDeepStrategy : IRDeepStrategy
     {
-        public IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<int> LastNumbers)
+        public IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<RDeepPosition> LastNumbers)
         {
             List<RDeepBet> result = new List<RDeepBet>();
 

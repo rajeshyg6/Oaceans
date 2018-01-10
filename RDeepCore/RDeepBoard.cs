@@ -13,8 +13,8 @@ namespace RDeepCore
     {
         internal RDeepDealer boardDealer;
         internal List<RDeepPlayer> boardPlayers;
-        public List<int> LastNumbers;
-        public int CurrentNumber;
+        public List<RDeepPosition> LastNumbers;
+        public RDeepPosition CurrentNumber;
         public List<RDeepBet> bets;
         
         public List<RDeepPosition> BoardPositions;// = new List<RDeepPosition>();
@@ -22,7 +22,7 @@ namespace RDeepCore
         public RDeepBoard()
         {
             boardPlayers = new List<RDeepPlayer>();
-            LastNumbers = new List<int>();
+            LastNumbers = new List<RDeepPosition>();
             bets = new List<RDeepBet>();
 
             LoadBoardBetPositions();
@@ -83,7 +83,7 @@ namespace RDeepCore
             if (bets.Count < 1)
                 throw new Exception("No bets");
 
-            CurrentNumber = Generic.GetRandomNumber(0, 38);
+            CurrentNumber = RDeepPositions.GetPositionByID(Generic.GetRandomNumber(0, 38));
 
             LastNumbers.Add(CurrentNumber);
 
@@ -136,7 +136,7 @@ namespace RDeepCore
         {
             foreach (RDeepBet bet in bets)
             {
-                if (RDeepBetPositions.ValidateBet(bet.BetPosition, CurrentNumber))
+                if (RDeepBetPositions.ValidateBet(bet.BetPosition, CurrentNumber.ID))
                     bet.status = BetStatus.Won;
                 else
                     bet.status = BetStatus.Lost;
@@ -155,7 +155,7 @@ namespace RDeepCore
         {
             string result = "***** Summary of roll *****\n";
 
-            result += "\n\t** Current number is " + RDeepPositions.GetPositionByID(CurrentNumber).Name;
+            result += "\n\t** Current number is " + CurrentNumber.Name;
 
             foreach (RDeepPlayer player in boardPlayers)
             {

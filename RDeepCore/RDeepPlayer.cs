@@ -21,7 +21,7 @@ namespace RDeepCore
                 RDeepStrategy = new BetByTenFifteenStrategy();
         }
 
-        public IEnumerable<RDeepBet> GoForBet(List<int> LastNumbers)
+        public IEnumerable<RDeepBet> GoForBet(List<RDeepPosition> LastNumbers)
         {
             return RDeepStrategy.GoForBet(this, LastNumbers);
         }
