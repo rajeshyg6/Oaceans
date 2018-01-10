@@ -26,14 +26,14 @@ namespace RDeepCore
 
     class BetByTenFifteenStrategy : IRDeepStrategy
     {
-        Dictionary<int, float> probabilities;
+        Dictionary<RDeepPosition, float> probabilities;
         Dictionary<PositonTypeCategory, List<int>> probabilityUpgradeFactorsOnHit;
 
         IEnumerable<RDeepPosition> wheelNumbers;
 
         public BetByTenFifteenStrategy()
         {
-            probabilities = new Dictionary<int, float>();
+            probabilities = new Dictionary<RDeepPosition, float>();
 
             wheelNumbers = RDeepPositions.rDeepPositions.Where(num => num.isWheelNumber == true);
 
@@ -61,7 +61,7 @@ namespace RDeepCore
         {
             foreach (RDeepPosition number in wheelNumbers)
             {
-                probabilities.Add(number.ID, number.defaultProbability);
+                probabilities.Add(number, number.defaultProbability);
             }
         }
 
@@ -76,14 +76,18 @@ namespace RDeepCore
             }
         }
 
-        private void UpdateProbabilitiesByPosType(PositionTypeSubCategory category, List<RDeepPosition> LastNumbers)
+        private void UpdateProbabilitiesByPosType(PositionTypeSubCategory subCategory, List<RDeepPosition> LastNumbers)
         {
             int HitCount = 1;
-            if (category != PositionTypeSubCategory.Straight)
-                HitCount = GetPositionTypeHitCount(category, LastNumbers);
+            if (subCategory != PositionTypeSubCategory.Straight)
+                HitCount = GetPositionTypeHitCount(subCategory, LastNumbers);
+
+            PositonTypeCategory Category = GetPositonTypeCategory(subCategory);
+
+            //probabilityUpgradeFactorsOnHit[Category].[HitCount];
         }
 
-        private int GetPositionTypeHitCount(PositionTypeSubCategory category, List<RDeepPosition> LastNumbers)
+        private int GetPositionTypeHitCount(PositionTypeSubCategory subCategory, List<RDeepPosition> LastNumbers)
         {
             int result = 1;
 
@@ -92,7 +96,7 @@ namespace RDeepCore
 
             for (int index = LastNumbers.Count - 1; index >= 0; index--)
             {
-                CurrentPositionType = GetPositionType(category, LastNumbers[index]);
+                CurrentPositionType = GetPositionType(subCategory, LastNumbers[index]);
 
                 if (LastPositionType == CurrentPositionType)
                     result++;
@@ -105,30 +109,30 @@ namespace RDeepCore
             return result;
         }
 
-        private PositonType GetPositionType(PositionTypeSubCategory category, RDeepPosition pos)
+        private PositonType GetPositionType(PositionTypeSubCategory subCategory, RDeepPosition pos)
         {
-            if (category == PositionTypeSubCategory.Color)
+            if (subCategory == PositionTypeSubCategory.Color)
             {
                 if (pos.isRed)
                     return PositonType.Red;
                 else
                     return PositonType.Black;
             }
-            else if (category == PositionTypeSubCategory.OddEven)
+            else if (subCategory == PositionTypeSubCategory.OddEven)
             {
                 if (pos.isEven)
                     return PositonType.Even;
                 else
                     return PositonType.Odd;
             }
-            else if (category == PositionTypeSubCategory.LowHigh)
+            else if (subCategory == PositionTypeSubCategory.LowHigh)
             {
                 if (pos.isLow)
                     return PositonType.Low;
                 else
                     return PositonType.High;
             }
-            else if (category == PositionTypeSubCategory.Dozen)
+            else if (subCategory == PositionTypeSubCategory.Dozen)
             {
                 if (pos.isFirstDozen)
                     return PositonType.FirstDozen;
@@ -137,7 +141,7 @@ namespace RDeepCore
                 else
                     return PositonType.ThirdDozen;
             }
-            else if (category == PositionTypeSubCategory.Column)
+            else if (subCategory == PositionTypeSubCategory.Column)
             {
                 if (pos.isFirstColumn)
                     return PositonType.FirstColumn;
@@ -148,6 +152,20 @@ namespace RDeepCore
             }
             else
                 return PositonType.Straight;
+        }
+
+        private PositonTypeCategory GetPositonTypeCategory(PositionTypeSubCategory subCategory)
+        {
+            if (subCategory == PositionTypeSubCategory.Color || subCategory == PositionTypeSubCategory.OddEven || subCategory == PositionTypeSubCategory.LowHigh)
+            {
+                return PositonTypeCategory.Even;
+            }
+            else if (subCategory == PositionTypeSubCategory.Column || subCategory == PositionTypeSubCategory.Dozen)
+            {
+                return PositonTypeCategory.Third;
+            }
+            else
+                return PositonTypeCategory.Straight;
         }
 
         private PositonTypeCategory GetPositonTypeCategory(PositonType posType)
