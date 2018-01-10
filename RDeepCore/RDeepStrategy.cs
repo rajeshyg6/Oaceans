@@ -27,7 +27,7 @@ namespace RDeepCore
     class BetByTenFifteenStrategy : IRDeepStrategy
     {
         Dictionary<RDeepPosition, float> probabilities;
-        Dictionary<PositonTypeCategory, List<int>> probabilityUpgradeFactorsOnHit;
+        Dictionary<PositionTypeCategory, List<int>> probabilityUpgradeFactorsOnHit;
 
         IEnumerable<RDeepPosition> wheelNumbers;
 
@@ -51,10 +51,35 @@ namespace RDeepCore
 
         private void SetProbabilityUpgradeFactorsOnHit()
         {
-            probabilityUpgradeFactorsOnHit = new Dictionary<PositonTypeCategory, List<int>>();
-            probabilityUpgradeFactorsOnHit.Add(PositonTypeCategory.Even, new List<int> { 10, 5, 0, 0, -8, -2, -1, -1, -1, -1, -1 });
-            probabilityUpgradeFactorsOnHit.Add(PositonTypeCategory.Third, new List<int> { 15, 2, -2, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
-            probabilityUpgradeFactorsOnHit.Add(PositonTypeCategory.Straight, new List<int> { 220, -1 });
+            probabilityUpgradeFactorsOnHit = new Dictionary<PositionTypeCategory, List<int>>();
+            probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Even, new List<int> { 10, 5, 0, 0, -8, -2, -1, -1, -1, -1, -1 });
+            probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Third, new List<int> { 15, 2, -2, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
+            probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Straight, new List<int> { 220, -1 });
+        }
+        
+        private int GetProbabilityUpgradeFactorsOnHit(PositionTypeCategory category, int hitCount)
+        {
+            List<int> ProbabilityUpgradeFactorOnHit = new List<int>();
+            ProbabilityUpgradeFactorOnHit = probabilityUpgradeFactorsOnHit[category];
+
+            if (category == PositionTypeCategory.Straight)
+                hitCount = 1;
+
+            return ProbabilityUpgradeFactorOnHit[hitCount];
+        }
+        
+
+        private float GetProbabilityUpgradeRate(PositionType type)
+        {
+            int totalNumbersOfType = 0;
+            int totalWheenNumber = wheelNumbers.Count();
+
+            if (type == PositionType.Straight)
+                totalNumbersOfType = 1;
+            else
+                totalNumbersOfType = RDeepPositions.PositionNumbersByType(type).Count();
+
+            return RDeepPosition.One.defaultProbability / (totalWheenNumber - totalNumbersOfType);
         }
 
         private void SetDefaultProbabilities()
@@ -72,27 +97,29 @@ namespace RDeepCore
             RDeepPosition currentPos = LastNumbers[LastNumbers.Count - 1];
             foreach(PositionTypeSubCategory category in Enum.GetValues(typeof(PositionTypeSubCategory)))
             {
-                UpdateProbabilitiesByPosType(category, LastNumbers);
+                UpdateProbabilitiesByPosType(category, LastNumbers, currentPos);
             }
         }
 
-        private void UpdateProbabilitiesByPosType(PositionTypeSubCategory subCategory, List<RDeepPosition> LastNumbers)
+        private void UpdateProbabilitiesByPosType(PositionTypeSubCategory subCategory, List<RDeepPosition> LastNumbers, RDeepPosition currentPos)
         {
             int HitCount = 1;
             if (subCategory != PositionTypeSubCategory.Straight)
                 HitCount = GetPositionTypeHitCount(subCategory, LastNumbers);
 
-            PositonTypeCategory Category = GetPositonTypeCategory(subCategory);
+            PositionTypeCategory Category = GetPositonTypeCategory(subCategory);
+            int Factor = GetProbabilityUpgradeFactorsOnHit(Category, HitCount);
 
-            //probabilityUpgradeFactorsOnHit[Category].[HitCount];
+            PositionType type = GetPositionType(subCategory, currentPos);
+            float Rate = GetProbabilityUpgradeRate(type);
         }
 
         private int GetPositionTypeHitCount(PositionTypeSubCategory subCategory, List<RDeepPosition> LastNumbers)
         {
             int result = 1;
 
-            PositonType LastPositionType = PositonType.Straight;
-            PositonType CurrentPositionType = PositonType.Straight;
+            PositionType LastPositionType = PositionType.Straight;
+            PositionType CurrentPositionType = PositionType.Straight;
 
             for (int index = LastNumbers.Count - 1; index >= 0; index--)
             {
@@ -109,77 +136,77 @@ namespace RDeepCore
             return result;
         }
 
-        private PositonType GetPositionType(PositionTypeSubCategory subCategory, RDeepPosition pos)
+        private PositionType GetPositionType(PositionTypeSubCategory subCategory, RDeepPosition pos)
         {
             if (subCategory == PositionTypeSubCategory.Color)
             {
                 if (pos.isRed)
-                    return PositonType.Red;
+                    return PositionType.Red;
                 else
-                    return PositonType.Black;
+                    return PositionType.Black;
             }
             else if (subCategory == PositionTypeSubCategory.OddEven)
             {
                 if (pos.isEven)
-                    return PositonType.Even;
+                    return PositionType.Even;
                 else
-                    return PositonType.Odd;
+                    return PositionType.Odd;
             }
             else if (subCategory == PositionTypeSubCategory.LowHigh)
             {
                 if (pos.isLow)
-                    return PositonType.Low;
+                    return PositionType.Low;
                 else
-                    return PositonType.High;
+                    return PositionType.High;
             }
             else if (subCategory == PositionTypeSubCategory.Dozen)
             {
                 if (pos.isFirstDozen)
-                    return PositonType.FirstDozen;
+                    return PositionType.FirstDozen;
                 else if (pos.isSecondDozen)
-                    return PositonType.SecondDozen;
+                    return PositionType.SecondDozen;
                 else
-                    return PositonType.ThirdDozen;
+                    return PositionType.ThirdDozen;
             }
             else if (subCategory == PositionTypeSubCategory.Column)
             {
                 if (pos.isFirstColumn)
-                    return PositonType.FirstColumn;
+                    return PositionType.FirstColumn;
                 else if (pos.isSecondColumn)
-                    return PositonType.SecondColumn;
+                    return PositionType.SecondColumn;
                 else
-                    return PositonType.ThirdColumn;
+                    return PositionType.ThirdColumn;
             }
             else
-                return PositonType.Straight;
+                return PositionType.Straight;
         }
 
-        private PositonTypeCategory GetPositonTypeCategory(PositionTypeSubCategory subCategory)
+        private PositionTypeCategory GetPositonTypeCategory(PositionTypeSubCategory subCategory)
         {
             if (subCategory == PositionTypeSubCategory.Color || subCategory == PositionTypeSubCategory.OddEven || subCategory == PositionTypeSubCategory.LowHigh)
             {
-                return PositonTypeCategory.Even;
+                return PositionTypeCategory.Even;
             }
             else if (subCategory == PositionTypeSubCategory.Column || subCategory == PositionTypeSubCategory.Dozen)
             {
-                return PositonTypeCategory.Third;
+                return PositionTypeCategory.Third;
             }
             else
-                return PositonTypeCategory.Straight;
+                return PositionTypeCategory.Straight;
         }
 
-        private PositonTypeCategory GetPositonTypeCategory(PositonType posType)
+        private PositionTypeCategory GetPositonTypeCategory(PositionType posType)
         {
-            if (posType == PositonType.Black || posType == PositonType.Red || posType == PositonType.Odd || posType == PositonType.Even || posType == PositonType.Low || posType == PositonType.High)
+            if (posType == PositionType.Black || posType == PositionType.Red || posType == PositionType.Odd || posType == PositionType.Even || posType == PositionType.Low || posType == PositionType.High)
             {
-                return PositonTypeCategory.Even;
+                return PositionTypeCategory.Even;
             }
-            else if (posType == PositonType.FirstColumn || posType == PositonType.SecondColumn || posType == PositonType.ThirdColumn || posType == PositonType.FirstDozen || posType == PositonType.SecondDozen || posType == PositonType.ThirdDozen)
+            else if (posType == PositionType.FirstColumn || posType == PositionType.SecondColumn || posType == PositionType.ThirdColumn || posType == PositionType.FirstDozen || posType == PositionType.SecondDozen || posType == PositionType.ThirdDozen)
             {
-                return PositonTypeCategory.Third;
+                return PositionTypeCategory.Third;
             }
             else
-                return PositonTypeCategory.Straight;
+                return PositionTypeCategory.Straight;
         }
     }
 
