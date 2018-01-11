@@ -116,25 +116,23 @@ namespace RDeepTest
                 Console.WriteLine("\n");
                 Console.WriteLine(board.DisplayPlayersProbabilities());
 
-                string s = "a";
-                /*
-                s += board.DisplayBetAndWinningNumbers();
-                Console.WriteLine(s);
+                string s = "";
+                //s += board.DisplayBetAndWinningNumbers();
+                //Console.WriteLine(s);
 
                 s = board.DisplayBoardPlayersCoinsValue();
                 Console.WriteLine(s);
-
+                /*
                 s = board.DisplayBoardInfo();
                 if (s.Contains("MISMATCH"))
                     Console.ForegroundColor = ConsoleColor.Red;
                 else
                     Console.ForegroundColor = ConsoleColor.Green;
-
+                */
                 Console.WriteLine(s);
                 Console.ResetColor();
                 
                 board.ClearBets();
-                */
                 if (s.Contains("a")) //(s.Contains("Lost") && s.Contains("12") && s.Contains("; "))
                 {
                     Console.WriteLine("\nHit S to spin again.");

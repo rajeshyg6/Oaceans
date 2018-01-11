@@ -47,7 +47,7 @@ namespace RDeepCore
         public RDeepPositions()
         {
             AddrDeepPositions();
-
+            AssignDefaultProbabilities();
         }
 
         private static void AddrDeepPositions()
@@ -112,7 +112,7 @@ namespace RDeepCore
             int wheelNumbersCount = wheelNumbers.Count();
             foreach (RDeepPosition number in wheelNumbers)
             {
-                number.defaultProbability = 100 / wheelNumbersCount;
+                number.defaultProbability = (float)100 / wheelNumbersCount;
             }
         }
 
@@ -295,7 +295,6 @@ namespace RDeepCore
             ID = id;
             Name = name;
             isWheelNumber = iswheelnumber;
-            SetFlags();
 
             isRed = false;
             isBlack = false;
@@ -310,6 +309,8 @@ namespace RDeepCore
             isSecondColumn = false;
             isThirdColumn = false;
             isGreen = false;
+
+            SetFlags();
         }
 
         private void SetFlags()
@@ -342,16 +343,16 @@ namespace RDeepCore
                     isThirdDozen = true;
                 }
 
-                if (Convert.ToInt32(ID) % 2 == 0)
+                if (Convert.ToInt32(ID) % 2 == 0 && isWheelNumber)
                 {
                     isEven = true;
                 }
-                else if (Convert.ToInt32(ID) % 2 != 0)
+                else
                 {
-                    isOdd = true;
+                    isOdd = isWheelNumber;
                 }
 
-                if (Convert.ToInt32(ID) % 3 == 0)
+                if (Convert.ToInt32(ID) % 3 == 0 && isWheelNumber)
                 {
                     isFirstColumn = true;
                 }
@@ -361,13 +362,13 @@ namespace RDeepCore
                 }
                 else
                 {
-                    isThirdColumn = true;
+                    isThirdColumn = isWheelNumber;
                 }
 
                 if (ID == 1 || ID == 3 || ID == 5 || ID == 7 || ID == 9 || ID == 12 || ID == 14 || ID == 16 || ID == 18 || ID == 19 || ID == 21 || ID == 23 || ID == 25 || ID == 27 || ID == 30 || ID == 32 || ID == 34 || ID == 36)
                     isRed = true;
                 else
-                    isBlack = true;
+                    isBlack = isWheelNumber;
             }
         }
 

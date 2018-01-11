@@ -96,8 +96,8 @@ namespace RDeepCore
                 else
                     result += "\t [B] ";
 
-                result += "\t: Probability = " + probabilities[number].ToString() + "";
-                result += "\t: Default Probability = " + number.defaultProbability.ToString() + "\n";
+                result += string.Format("\t: Probability = {0:0.0000}", probabilities[number]);
+                result += string.Format("\t: Default Probability = {0:0.0000}\n", number.defaultProbability);
             }
             return result;
         }
@@ -125,7 +125,7 @@ namespace RDeepCore
         {
             int totalWheenNumber = wheelNumbers.Count();
 
-            return RDeepPosition.One.defaultProbability / (totalWheenNumber - totalNumbersOfType);
+            return (float)RDeepPosition.One.defaultProbability / (totalWheenNumber - totalNumbersOfType);
         }
 
         private void SetDefaultProbabilities()
@@ -169,7 +169,13 @@ namespace RDeepCore
             int Factor = GetProbabilityUpgradeFactorsOnHit(Category, HitCount);
 
             PositionType hitType = GetPositionType(subCategory, currentPos);
-            IEnumerable<RDeepPosition> numbersOfHitType = RDeepPositions.PositionNumbersByType(hitType);
+
+            List<RDeepPosition> numbersOfHitType = new List<RDeepPosition>();
+            if (hitType == PositionType.Straight)
+                numbersOfHitType.Add(currentPos);
+            else
+                numbersOfHitType = RDeepPositions.PositionNumbersByType(hitType).ToList();
+
             IEnumerable<RDeepPosition> numbersOfNonHitType = wheelNumbers.Except(numbersOfHitType);
             float Rate = GetProbabilityUpgradeRate(numbersOfHitType.Count());
 
@@ -198,7 +204,7 @@ namespace RDeepCore
 
             foreach (RDeepPosition number in fromWheelNumbers)
             {
-                float probabilityToReduce = (probabilities[number] * probability) / totalCurrentProbability;
+                float probabilityToReduce = (float)(probabilities[number] * probability) / totalCurrentProbability;
                 probabilities[number] -= probabilityToReduce;
                 totalProbabilityReduced += probabilityToReduce;
             }
@@ -211,7 +217,17 @@ namespace RDeepCore
             float probabilityToAdd = probability / toWheelNumbers.Count();
             foreach (RDeepPosition number in toWheelNumbers)
             {
-                probabilities[number] += probabilityToAdd;
+                try
+                {
+                    probabilities[number] += probabilityToAdd;
+
+                }
+                catch (Exception ex)
+                {
+                    string err = "";// = ex.Message;
+                    err = ex.Message + string.Format("\n{0} does not exist in {1}", number.Name, probabilities.Count);
+                    throw new Exception(err);
+                }
             }
         }
 
@@ -337,11 +353,11 @@ namespace RDeepCore
                 if (player.coins.Count < 4)
                     randomTotalCoins = 1;
                 else
-                    randomTotalCoins = Generic.GetRandomNumber(1, 5);
+                    randomTotalCoins = Generic.GetRandomNumber(1, 3);
 
                 for (int i = 0; i < randomTotalCoins; i++)
                 {
-                    List<Coin> activeCoins = player.coins.Where(coin => coin.isOnBet == false).ToList();
+                    List<Coin> activeCoins = player.coins.Where(coin => coin.isOnBet == false && coin.Value <= 5).ToList();
                     int randomCoin = Generic.GetRandomNumber(0, activeCoins.Count);
                     activeCoins[randomCoin].isOnBet = true;
                     betCoins.Add(activeCoins[randomCoin]);
