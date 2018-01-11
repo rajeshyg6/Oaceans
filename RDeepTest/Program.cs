@@ -18,14 +18,15 @@ namespace RDeepTest
         static void Main(string[] args)
         {
             //WriteRandomNumbersToFile();
-            return;
+            //return;
             board = new RDeepBoard();
+            /*
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("\n****Game Starts*****\n");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(board.DisplayBoardInfo());
             Console.ResetColor();
-
+            */
             Spin();
             //ShowAllPositions();
 
@@ -109,7 +110,14 @@ namespace RDeepTest
             {
                 board.CallForBets();
                 board.Spin();
-                string s = "";
+
+                Console.Clear();
+                Console.WriteLine(board.DisplayLastNumbers());
+                Console.WriteLine("\n");
+                Console.WriteLine(board.DisplayPlayersProbabilities());
+
+                string s = "a";
+                /*
                 s += board.DisplayBetAndWinningNumbers();
                 Console.WriteLine(s);
 
@@ -126,6 +134,7 @@ namespace RDeepTest
                 Console.ResetColor();
                 
                 board.ClearBets();
+                */
                 if (s.Contains("a")) //(s.Contains("Lost") && s.Contains("12") && s.Contains("; "))
                 {
                     Console.WriteLine("\nHit S to spin again.");

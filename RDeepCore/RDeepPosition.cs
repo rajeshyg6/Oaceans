@@ -130,14 +130,14 @@ namespace RDeepCore
             return result;
         }
 
-        internal static IEnumerable<int> PositionNumbers()
+        internal static IEnumerable<RDeepPosition> PositionNumbers()
         {
             return PositionNumbersByType(PositionType.Straight);
         }
 
-        internal static IEnumerable<int> PositionNumbersByType(PositionType positionType)
+        internal static IEnumerable<RDeepPosition> PositionNumbersByType(PositionType positionType)
         {
-            List<int> result = new List<int>();
+            List<RDeepPosition> result = new List<RDeepPosition>();
 
             switch (positionType)
             {
@@ -145,91 +145,91 @@ namespace RDeepCore
                     foreach (RDeepPosition pos in rDeepPositions)
                     {
                         if (pos.isWheelNumber == true)
-                            result.Add(pos.ID);
+                            result.Add(pos);
                     }
                     break;
                 case PositionType.Red:
                     foreach (RDeepPosition pos in rDeepPositions)
                     {
                         if (pos.isRed == true)
-                            result.Add(pos.ID);
+                            result.Add(pos);
                     }
                     break;
                 case PositionType.Black:
                     foreach (RDeepPosition pos in rDeepPositions)
                     {
                         if (pos.isBlack == true)
-                            result.Add(pos.ID);
+                            result.Add(pos);
                     }
                     break;
                 case PositionType.Even:
                     foreach (RDeepPosition pos in rDeepPositions)
                     {
                         if (pos.isEven == true)
-                            result.Add(pos.ID);
+                            result.Add(pos);
                     }
                     break;
                 case PositionType.Odd:
                     foreach (RDeepPosition pos in rDeepPositions)
                     {
                         if (pos.isOdd == true)
-                            result.Add(pos.ID);
+                            result.Add(pos);
                     }
                     break;
                 case PositionType.Low:
                     foreach (RDeepPosition pos in rDeepPositions)
                     {
                         if (pos.isLow == true)
-                            result.Add(pos.ID);
+                            result.Add(pos);
                     }
                     break;
                 case PositionType.High:
                     foreach (RDeepPosition pos in rDeepPositions)
                     {
                         if (pos.isHigh == true)
-                            result.Add(pos.ID);
+                            result.Add(pos);
                     }
                     break;
                 case PositionType.FirstDozen:
                     foreach (RDeepPosition pos in rDeepPositions)
                     {
                         if (pos.isFirstDozen == true)
-                            result.Add(pos.ID);
+                            result.Add(pos);
                     }
                     break;
                 case PositionType.SecondDozen:
                     foreach (RDeepPosition pos in rDeepPositions)
                     {
                         if (pos.isSecondDozen == true)
-                            result.Add(pos.ID);
+                            result.Add(pos);
                     }
                     break;
                 case PositionType.ThirdDozen:
                     foreach (RDeepPosition pos in rDeepPositions)
                     {
                         if (pos.isThirdDozen == true)
-                            result.Add(pos.ID);
+                            result.Add(pos);
                     }
                     break;
                 case PositionType.FirstColumn:
                     foreach (RDeepPosition pos in rDeepPositions)
                     {
                         if (pos.isFirstColumn == true)
-                            result.Add(pos.ID);
+                            result.Add(pos);
                     }
                     break;
                 case PositionType.SecondColumn:
                     foreach (RDeepPosition pos in rDeepPositions)
                     {
                         if (pos.isSecondColumn == true)
-                            result.Add(pos.ID);
+                            result.Add(pos);
                     }
                     break;
                 case PositionType.ThirdColumn:
                     foreach (RDeepPosition pos in rDeepPositions)
                     {
                         if (pos.isThirdColumn == true)
-                            result.Add(pos.ID);
+                            result.Add(pos);
                     }
                     break;
             }

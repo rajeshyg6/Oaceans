@@ -22,11 +22,12 @@ namespace RDeepCore
     interface IRDeepStrategy
     {
         IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<RDeepPosition> LastNumbers);
+        string DisplayProbability();
     }
 
     class BetByTenFifteenStrategy : IRDeepStrategy
     {
-        Dictionary<RDeepPosition, float> probabilities;
+        internal Dictionary<RDeepPosition, float> probabilities;
         Dictionary<PositionTypeCategory, List<int>> probabilityUpgradeFactorsOnHit;
 
         IEnumerable<RDeepPosition> wheelNumbers;
@@ -46,6 +47,58 @@ namespace RDeepCore
 
             UpdateProbabilities(LastNumbers);
 
+            RDeepPosition maxProbableNumber = RDeepPosition.Six;
+            float maxProbability = maxProbableNumber.defaultProbability;
+
+            foreach (RDeepPosition number in wheelNumbers)
+            {
+                if (maxProbability < probabilities[number])
+                {
+                    maxProbability = probabilities[number];
+                    maxProbableNumber = number;
+                }
+            }
+
+            List<Coin> betCoins = new List<Coin>();
+
+            int randomTotalCoins;
+
+            if (player.coins.Count < 4)
+                randomTotalCoins = 1;
+            else
+                randomTotalCoins = Generic.GetRandomNumber(1, 3);
+
+            for (int i = 0; i < randomTotalCoins; i++)
+            {
+                List<Coin> activeCoins = player.coins.Where(coin => coin.isOnBet == false && coin.Value <= 5).ToList();
+                int randomCoin = Generic.GetRandomNumber(0, activeCoins.Count);
+                activeCoins[randomCoin].isOnBet = true;
+                betCoins.Add(activeCoins[randomCoin]);
+                System.Threading.Thread.Sleep(100);
+            }
+
+            result.Add(new RDeepBet(
+                player,
+                RDeepBetPositions.GetRDeepBetPositionByPositionIDs(new int[] { maxProbableNumber.ID }),
+                betCoins));
+
+            return result;
+        }
+
+        public string DisplayProbability()
+        {
+            string result = "";
+            foreach (RDeepPosition number in wheelNumbers)
+            {
+                result += number.Name;
+                if (number.isRed)
+                    result += "\t [R] ";
+                else
+                    result += "\t [B] ";
+
+                result += "\t: Probability = " + probabilities[number].ToString() + "";
+                result += "\t: Default Probability = " + number.defaultProbability.ToString() + "\n";
+            }
             return result;
         }
 
@@ -67,32 +120,37 @@ namespace RDeepCore
 
             return ProbabilityUpgradeFactorOnHit[hitCount];
         }
-        
 
-        private float GetProbabilityUpgradeRate(PositionType type)
+        private float GetProbabilityUpgradeRate(int totalNumbersOfType)
         {
-            int totalNumbersOfType = 0;
             int totalWheenNumber = wheelNumbers.Count();
-
-            if (type == PositionType.Straight)
-                totalNumbersOfType = 1;
-            else
-                totalNumbersOfType = RDeepPositions.PositionNumbersByType(type).Count();
 
             return RDeepPosition.One.defaultProbability / (totalWheenNumber - totalNumbersOfType);
         }
 
         private void SetDefaultProbabilities()
         {
-            foreach (RDeepPosition number in wheelNumbers)
+            if (probabilities.Count == 0)
             {
-                probabilities.Add(number, number.defaultProbability);
+                foreach (RDeepPosition number in wheelNumbers)
+                {
+                    probabilities.Add(number, number.defaultProbability);
+                }
+            }
+            else
+            {
+                foreach (RDeepPosition number in wheelNumbers)
+                {
+                    probabilities[number] = number.defaultProbability;
+                }
             }
         }
 
         private void UpdateProbabilities(List<RDeepPosition> LastNumbers)
         {
             SetDefaultProbabilities();
+
+            if (LastNumbers.Count == 0) return;
 
             RDeepPosition currentPos = LastNumbers[LastNumbers.Count - 1];
             foreach(PositionTypeSubCategory category in Enum.GetValues(typeof(PositionTypeSubCategory)))
@@ -110,8 +168,51 @@ namespace RDeepCore
             PositionTypeCategory Category = GetPositonTypeCategory(subCategory);
             int Factor = GetProbabilityUpgradeFactorsOnHit(Category, HitCount);
 
-            PositionType type = GetPositionType(subCategory, currentPos);
-            float Rate = GetProbabilityUpgradeRate(type);
+            PositionType hitType = GetPositionType(subCategory, currentPos);
+            IEnumerable<RDeepPosition> numbersOfHitType = RDeepPositions.PositionNumbersByType(hitType);
+            IEnumerable<RDeepPosition> numbersOfNonHitType = wheelNumbers.Except(numbersOfHitType);
+            float Rate = GetProbabilityUpgradeRate(numbersOfHitType.Count());
+
+            if (Factor < 0)
+            {
+                ShiftProbability(numbersOfHitType, numbersOfNonHitType, Factor * Rate);
+            }
+            else if (Factor > 0)
+            {
+                ShiftProbability(numbersOfNonHitType, numbersOfHitType, Factor * Rate);
+            }
+        }
+
+        private void ShiftProbability(IEnumerable<RDeepPosition> fromWheelNumbers, IEnumerable<RDeepPosition> toWheelNumbers, float probability)
+        {
+            probability = ReduceProbability(fromWheelNumbers, probability);
+            AddProbability(toWheelNumbers, probability);
+        }
+
+        private float ReduceProbability(IEnumerable<RDeepPosition> fromWheelNumbers, float probability)
+        {
+            float totalProbabilityReduced = 0;
+            float totalCurrentProbability = 0;
+            foreach (RDeepPosition number in fromWheelNumbers)
+                totalCurrentProbability += probabilities[number];
+
+            foreach (RDeepPosition number in fromWheelNumbers)
+            {
+                float probabilityToReduce = (probabilities[number] * probability) / totalCurrentProbability;
+                probabilities[number] -= probabilityToReduce;
+                totalProbabilityReduced += probabilityToReduce;
+            }
+
+            return totalProbabilityReduced;
+        }
+
+        private void AddProbability(IEnumerable<RDeepPosition> toWheelNumbers, float probability)
+        {
+            float probabilityToAdd = probability / toWheelNumbers.Count();
+            foreach (RDeepPosition number in toWheelNumbers)
+            {
+                probabilities[number] += probabilityToAdd;
+            }
         }
 
         private int GetPositionTypeHitCount(PositionTypeSubCategory subCategory, List<RDeepPosition> LastNumbers)
@@ -212,6 +313,11 @@ namespace RDeepCore
 
     class RandomRDeepStrategy : IRDeepStrategy
     {
+        public string DisplayProbability()
+        {
+            return "";// throw new NotImplementedException();
+        }
+
         public IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<RDeepPosition> LastNumbers)
         {
             List<RDeepBet> result = new List<RDeepBet>();

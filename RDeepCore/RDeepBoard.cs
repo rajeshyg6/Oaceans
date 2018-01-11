@@ -181,6 +181,28 @@ namespace RDeepCore
             return result;
         }
 
+        public string DisplayLastNumbers()
+        {
+            string result = "";
+
+            foreach (RDeepPosition number in LastNumbers)
+                result += number.Name + ", ";
+
+            return result;
+        }
+
+        public string DisplayPlayersProbabilities()
+        {
+            string result = "";
+
+            foreach (RDeepPlayer player in boardPlayers)
+            {
+                result += "\nPlayer: " + player.Name + "\n";
+                result += player.DisplayProbability();
+            }
+            return result;
+        }
+
         public string DisplayBoardPlayersCoinsValue()
         {
             string result = "";
