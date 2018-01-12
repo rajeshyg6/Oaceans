@@ -43,6 +43,10 @@ namespace RDeepCore
 
         public IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<RDeepPosition> LastNumbers)
         {
+
+            if (player.coins.Count < 1)
+                throw new Exception("Running out of coins!");
+
             List<RDeepBet> result = new List<RDeepBet>();
 
             UpdateProbabilities(LastNumbers);
@@ -70,7 +74,7 @@ namespace RDeepCore
 
             for (int i = 0; i < randomTotalCoins; i++)
             {
-                List<Coin> activeCoins = player.coins.Where(coin => coin.isOnBet == false && coin.Value <= 5).ToList();
+                List<Coin> activeCoins = player.coins.Where(coin => coin.isOnBet == false && coin.Value <= 25).ToList();
                 int randomCoin = Generic.GetRandomNumber(0, activeCoins.Count);
                 activeCoins[randomCoin].isOnBet = true;
                 betCoins.Add(activeCoins[randomCoin]);
@@ -105,8 +109,8 @@ namespace RDeepCore
         private void SetProbabilityUpgradeFactorsOnHit()
         {
             probabilityUpgradeFactorsOnHit = new Dictionary<PositionTypeCategory, List<int>>();
-            probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Even, new List<int> { 10, 5, 0, 0, -8, -2, -1, -1, -1, -1, -1 });
-            probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Third, new List<int> { 15, 2, -2, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 });
+            probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Even, new List<int> { 10, 5, 5, 5, -5, -5, -6, -7, -8, -9, -10 });
+            probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Third, new List<int> { 15, 2, -2, -2, -2, -3, -6, -8, -9, -10, -11, -12, -13, -14, -15, -16});
             probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Straight, new List<int> { 220, -1 });
         }
         
@@ -335,6 +339,43 @@ namespace RDeepCore
         }
 
         public IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<RDeepPosition> LastNumbers)
+        {
+            List<RDeepBet> result = new List<RDeepBet>();
+
+            int randomWheelNumber = 7;
+
+            randomWheelNumber = Generic.GetRandomNumber(0, 38);
+
+            if (player.coins.Count < 1)
+                throw new Exception("Running out of coins!");
+
+            List<Coin> betCoins = new List<Coin>();
+
+            int randomTotalCoins;
+
+            if (player.coins.Count < 4)
+                randomTotalCoins = 1;
+            else
+                randomTotalCoins = Generic.GetRandomNumber(1, 3);
+
+            for (int i = 0; i < randomTotalCoins; i++)
+            {
+                List<Coin> activeCoins = player.coins.Where(coin => coin.isOnBet == false && coin.Value <= 25).ToList();
+                int randomCoin = Generic.GetRandomNumber(0, activeCoins.Count);
+                activeCoins[randomCoin].isOnBet = true;
+                betCoins.Add(activeCoins[randomCoin]);
+                System.Threading.Thread.Sleep(100);
+            }
+
+            result.Add(new RDeepBet(
+                player,
+                RDeepBetPositions.GetRDeepBetPositionByPositionIDs(new int[] { randomWheelNumber }),
+                betCoins));
+
+            return result;
+        }
+
+        public IEnumerable<RDeepBet> GoForBetRandom(RDeepPlayer player, List<RDeepPosition> LastNumbers)
         {
             List<RDeepBet> result = new List<RDeepBet>();
 

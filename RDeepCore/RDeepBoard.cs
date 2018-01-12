@@ -38,10 +38,10 @@ namespace RDeepCore
 
         private void CallForPlayers()
         {
-            RDeepPlayer RDeepPlayer = new RDeepPlayer("Mr.A", 1000, "Random");
+            RDeepPlayer RDeepPlayer = new RDeepPlayer("Mr.A", 5000, "Random");
             boardPlayers.Add(RDeepPlayer);
 
-            RDeepPlayer RDeepPlayer2 = new RDeepPlayer("Mr.B", 1000, "TenFifteen");
+            RDeepPlayer RDeepPlayer2 = new RDeepPlayer("Mr.B", 5000, "TenFifteen");
             boardPlayers.Add(RDeepPlayer2);
 
             /*

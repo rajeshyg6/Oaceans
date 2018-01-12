@@ -128,24 +128,19 @@ namespace RDeepTest
                     Console.ForegroundColor = ConsoleColor.Red;
                 else
                     Console.ForegroundColor = ConsoleColor.Green;
-                */
                 Console.WriteLine(s);
                 Console.ResetColor();
-                
+                */
+
                 board.ClearBets();
-                if (s.Contains("a")) //(s.Contains("Lost") && s.Contains("12") && s.Contains("; "))
-                {
-                    Console.WriteLine("\nHit S to spin again.");
+                Console.WriteLine("\nHit S to spin again.");
 
-                    //System.Threading.Thread.Sleep(100);
+                //System.Threading.Thread.Sleep(100);
 
-                    if (Console.ReadKey().KeyChar.ToString().ToLower() == "s")
-                        Spin();
-                }
-                else
+                if (Console.ReadKey().KeyChar.ToString().ToLower() == "s")
                     Spin();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine("\n Exception: " + e.Message.ToString() + "\nStack Trace: " + e.StackTrace.ToString());
             }
