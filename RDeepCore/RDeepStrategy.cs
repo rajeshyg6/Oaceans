@@ -43,7 +43,6 @@ namespace RDeepCore
 
         public IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<RDeepPosition> LastNumbers)
         {
-
             if (player.coins.Count < 1)
                 throw new Exception("Running out of coins!");
 
@@ -110,7 +109,7 @@ namespace RDeepCore
         {
             probabilityUpgradeFactorsOnHit = new Dictionary<PositionTypeCategory, List<int>>();
             probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Even, new List<int> { 10, 5, 5, 5, -5, -5, -6, -7, -8, -9, -10 });
-            probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Third, new List<int> { 15, 2, -2, -2, -2, -3, -6, -8, -9, -10, -11, -12, -13, -14, -15, -16});
+            probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Third, new List<int> { 15, 2, -2, -3, -4, -5, -6, -8, -9, -10, -11, -12, -13, -14, -15, -16});
             probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Straight, new List<int> { 220, -1 });
         }
         
