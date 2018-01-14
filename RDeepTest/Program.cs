@@ -64,7 +64,7 @@ namespace RDeepTest
                         List<int> randNums = new List<int>();
                         try
                         {
-                            for(int i = 1; i <- 38; i++)
+                            for(int i = 1; i < 38; i++)
                             {
                                 int TotalRandomNumbers = RandomNumLoad.randomeNumbers.Count();
                                 int groupActualTotal = RandomNumLoad.randomeNumbers.Count(num => num == i);
@@ -104,12 +104,12 @@ namespace RDeepTest
             }
         }
 
-        static void Spin()
+        static void Spin(int value = -1)
         {
             try
             {
                 board.CallForBets();
-                board.Spin();
+                board.Spin(value);
 
                 Console.Clear();
                 Console.WriteLine(board.DisplayLastNumbers());
@@ -137,7 +137,18 @@ namespace RDeepTest
 
                 //System.Threading.Thread.Sleep(100);
 
-                if (Console.ReadKey().KeyChar.ToString().ToLower() == "s")
+                string line = Console.ReadLine();
+
+                if (int.TryParse(line, out value))
+                {
+                    if (value >= 0 && value <= 37)
+                        Spin(value);
+                }
+                else if (line == "X")
+                {
+                    return;
+                }
+                else
                     Spin();
             }
             catch (Exception e)

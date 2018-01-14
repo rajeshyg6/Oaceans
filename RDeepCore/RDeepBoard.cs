@@ -78,12 +78,15 @@ namespace RDeepCore
             }
         }
 
-        public void Spin()
+        public void Spin(int value = -1)
         {
             if (bets.Count < 1)
                 throw new Exception("No bets");
 
-            CurrentNumber = RDeepPositions.GetPositionByID(Generic.GetRandomNumber(0, 38));
+            if (value == -1)
+                value = Generic.GetRandomNumber(0, 38);
+
+                CurrentNumber = RDeepPositions.GetPositionByID(value);
 
             LastNumbers.Add(CurrentNumber);
 

@@ -132,10 +132,10 @@ namespace RDeepCore
 
         internal static IEnumerable<RDeepPosition> PositionNumbers()
         {
-            return PositionNumbersByType(PositionType.Straight);
+            return NumbersByPositionType(PositionType.Straight);
         }
 
-        internal static IEnumerable<RDeepPosition> PositionNumbersByType(PositionType positionType)
+        internal static IEnumerable<RDeepPosition> NumbersByPositionType(PositionType positionType)
         {
             List<RDeepPosition> result = new List<RDeepPosition>();
 
@@ -354,15 +354,15 @@ namespace RDeepCore
 
                 if (Convert.ToInt32(ID) % 3 == 0 && isWheelNumber)
                 {
-                    isFirstColumn = true;
+                    isThirdColumn = true;
                 }
-                else if (ID == 1 || ID == 4 || ID == 7 || ID == 10 || ID == 13 || ID == 16 || ID == 19 || ID == 22 || ID == 25 || ID == 28 || ID == 31 || ID == 34)
+                else if (ID == 2 || ID == 5 || ID == 8 || ID == 11 || ID == 14 || ID == 17 || ID == 20 || ID == 23 || ID == 26 || ID == 29 || ID == 32 || ID == 35)
                 {
                     isSecondColumn = true;
                 }
                 else
                 {
-                    isThirdColumn = isWheelNumber;
+                    isFirstColumn = isWheelNumber;
                 }
 
                 if (ID == 1 || ID == 3 || ID == 5 || ID == 7 || ID == 9 || ID == 12 || ID == 14 || ID == 16 || ID == 18 || ID == 19 || ID == 21 || ID == 23 || ID == 25 || ID == 27 || ID == 30 || ID == 32 || ID == 34 || ID == 36)
@@ -372,17 +372,17 @@ namespace RDeepCore
             }
         }
 
-        public static readonly RDeepPosition Zero =                  new RDeepPosition(0, "0", true);
+        public static readonly RDeepPosition Zero =                  new RDeepPosition(0, " 0", true);
         public static readonly RDeepPosition DoubleZero =            new RDeepPosition(37, "00", true);
-        public static readonly RDeepPosition One =                   new RDeepPosition(1, "1", true);
-        public static readonly RDeepPosition Two =                   new RDeepPosition(2, "2", true);
-        public static readonly RDeepPosition Three =                 new RDeepPosition(3, "3", true);
-        public static readonly RDeepPosition Four =                  new RDeepPosition(4, "4", true);
-        public static readonly RDeepPosition Five =                  new RDeepPosition(5, "5", true);
-        public static readonly RDeepPosition Six =                   new RDeepPosition(6, "6", true);
-        public static readonly RDeepPosition Seven =                 new RDeepPosition(7, "7", true);
-        public static readonly RDeepPosition Eight =                 new RDeepPosition(8, "8", true);
-        public static readonly RDeepPosition Nine =                  new RDeepPosition(9, "9", true);
+        public static readonly RDeepPosition One =                   new RDeepPosition(1, " 1", true);
+        public static readonly RDeepPosition Two =                   new RDeepPosition(2, " 2", true);
+        public static readonly RDeepPosition Three =                 new RDeepPosition(3, " 3", true);
+        public static readonly RDeepPosition Four =                  new RDeepPosition(4, " 4", true);
+        public static readonly RDeepPosition Five =                  new RDeepPosition(5, " 5", true);
+        public static readonly RDeepPosition Six =                   new RDeepPosition(6, " 6", true);
+        public static readonly RDeepPosition Seven =                 new RDeepPosition(7, " 7", true);
+        public static readonly RDeepPosition Eight =                 new RDeepPosition(8, " 8", true);
+        public static readonly RDeepPosition Nine =                  new RDeepPosition(9, " 9", true);
         public static readonly RDeepPosition Ten =                   new RDeepPosition(10, "10", true);
         public static readonly RDeepPosition Eleven =                new RDeepPosition(11, "11", true);
         public static readonly RDeepPosition Twelve =                new RDeepPosition(12, "12", true);
