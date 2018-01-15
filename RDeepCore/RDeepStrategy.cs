@@ -172,7 +172,7 @@ namespace RDeepCore
         {
             probabilityUpgradeFactorsOnHit = new Dictionary<PositionTypeCategory, List<int>>();
             probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Even, new List<int> { 100, 5, 5, -3, -5, -5, -6, -7, -8, -9, -10 });
-            probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Third, new List<int> { 100, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15 });
+            probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Third, new List<int> { 100, -2, -2, -2, -3, -4, -6, -6, -8, -9, -10, -11, -12, -13, -14, -15 });
             probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Straight, new List<int> { 100, -1 }
             );
         }
