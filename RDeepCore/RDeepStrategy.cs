@@ -29,15 +29,23 @@ namespace RDeepCore
     {
         internal Dictionary<RDeepPosition, float> probabilities;
         Dictionary<PositionTypeCategory, List<int>> probabilityUpgradeFactorsOnHit;
+        Dictionary<PositionTypeCategory, List<UpgradeProbabilityOnFewerHits>> probabilityUpgradeFactorsOnFewerHits;
 
         Dictionary<PositionTypeSubCategory, Dictionary<RDeepPosition, float>> GroupsUpgradeProbability;
-        /*
-        Dictionary<RDeepPosition, float> OddEvenUpgradeProbability;
-        Dictionary<RDeepPosition, float> LowHighUpgradeProbability;
-        Dictionary<RDeepPosition, float> DozenUpgradeProbability;
-        Dictionary<RDeepPosition, float> ColumnUpgradeProbability;
-        Dictionary<RDeepPosition, float> StraightUpgradeProbability;
-        */
+
+        class UpgradeProbabilityOnFewerHits
+        {
+            public UpgradeProbabilityOnFewerHits(int SpinCount, int HitCount, int UpgradeFactor)
+            {
+                this.SpinCount = SpinCount;
+                this.HitCount = HitCount;
+                this.UpgradeFactor = UpgradeFactor;
+            }
+
+            public int SpinCount { get; set; }
+            public int HitCount { get; set; }
+            public int UpgradeFactor { get; set; }
+        }
 
         IEnumerable<RDeepPosition> wheelNumbers;
 
@@ -77,7 +85,7 @@ namespace RDeepCore
 
             int randomTotalCoins;
 
-            if (player.coins.Count < 4)
+            if (player.coins.Count(coin => coin.isOnBet == false && coin.Value <= 25) < 4)
                 randomTotalCoins = 1;
             else
                 randomTotalCoins = Generic.GetRandomNumber(1, 3);
@@ -164,9 +172,46 @@ namespace RDeepCore
         {
             probabilityUpgradeFactorsOnHit = new Dictionary<PositionTypeCategory, List<int>>();
             probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Even, new List<int> { 100, 5, 5, -3, -5, -5, -6, -7, -8, -9, -10 });
-            probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Third, new List<int> { 100, 2, -2, -3, -4, -5, -6, -8, -9, -10, -11, -12, -13, -14, -15, -16});
+            probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Third, new List<int> { 100, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15 });
             probabilityUpgradeFactorsOnHit.Add(PositionTypeCategory.Straight, new List<int> { 100, -1 }
             );
+        }
+
+        private void SetProbabilityUpgradeFactorsOnFewerHits()
+        {
+            probabilityUpgradeFactorsOnFewerHits = new Dictionary<PositionTypeCategory, List<UpgradeProbabilityOnFewerHits>>();
+
+            //Even
+            probabilityUpgradeFactorsOnFewerHits.Add(PositionTypeCategory.Even,
+                new List<UpgradeProbabilityOnFewerHits>
+                {
+                    new UpgradeProbabilityOnFewerHits(10, 1, 2),
+                    new UpgradeProbabilityOnFewerHits(10, 2, 1),
+                    new UpgradeProbabilityOnFewerHits(20, 1, 1),
+                    new UpgradeProbabilityOnFewerHits(20, 2, 1),
+                    new UpgradeProbabilityOnFewerHits(30, 3, 1),
+                }
+                );
+
+            //Third
+            probabilityUpgradeFactorsOnFewerHits.Add(PositionTypeCategory.Third,
+                    new List<UpgradeProbabilityOnFewerHits>
+                    {
+                        new UpgradeProbabilityOnFewerHits(15, 1, 2),
+                        new UpgradeProbabilityOnFewerHits(15, 2, 1),
+                        new UpgradeProbabilityOnFewerHits(30, 1, 1),
+                        new UpgradeProbabilityOnFewerHits(30, 2, 1),
+                        new UpgradeProbabilityOnFewerHits(45, 3, 1),
+                    }
+                );
+
+            //Straght
+            probabilityUpgradeFactorsOnFewerHits.Add(PositionTypeCategory.Straight,
+                    new List<UpgradeProbabilityOnFewerHits>
+                    {
+                        new UpgradeProbabilityOnFewerHits(100, 0, 1)
+                    }
+                );
         }
 
         private int GetProbabilityUpgradeFactorsOnHit(PositionTypeCategory category, int hitCount)
@@ -390,7 +435,7 @@ namespace RDeepCore
 
             randomWheelNumber = Generic.GetRandomNumber(0, 38);
 
-            if (player.coins.Count < 1)
+            if (player.coins.Count(coin => coin.isOnBet == false && coin.Value <=25) < 1)
                 throw new Exception("Running out of coins!");
 
             List<Coin> betCoins = new List<Coin>();
@@ -419,7 +464,7 @@ namespace RDeepCore
             return result;
         }
 
-        public IEnumerable<RDeepBet> GoForBetRandom(RDeepPlayer player, List<RDeepPosition> LastNumbers)
+        public IEnumerable<RDeepBet> GoForBetRandomBetTypes(RDeepPlayer player, List<RDeepPosition> LastNumbers)
         {
             List<RDeepBet> result = new List<RDeepBet>();
 
