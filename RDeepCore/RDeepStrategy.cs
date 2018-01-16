@@ -31,7 +31,7 @@ namespace RDeepCore
         Dictionary<PositionTypeCategory, List<int>> probabilityUpgradeFactorsOnHit;
         Dictionary<PositionTypeCategory, List<UpgradeProbabilityOnFewerHits>> probabilityUpgradeFactorsOnFewerHits;
 
-        Dictionary<PositionTypeSubCategory, Dictionary<RDeepPosition, float>> GroupsUpgradeProbability;
+        Dictionary<PositionType, Dictionary<RDeepPosition, float>> GroupsUpgradeProbability;
 
         class UpgradeProbabilityOnFewerHits
         {
@@ -214,6 +214,22 @@ namespace RDeepCore
                 );
         }
 
+        private int GetProbabilityUpgradeFactorsOnFewerHits(List<RDeepPosition> LastPositions, PositionTypeCategory category, PositionType positionType)
+        {
+            int factor = 0;
+
+            List<UpgradeProbabilityOnFewerHits> upgradeProbabilityOnFewerHits = probabilityUpgradeFactorsOnFewerHits[category];
+            foreach(UpgradeProbabilityOnFewerHits factorData in upgradeProbabilityOnFewerHits)
+            {
+                if (LastPositions.Count > factorData.SpinCount)
+                {
+                    if (LastPositions.Count(number => number.Column == positionType || number.Dozen == positionType || number.OddEven == positionType || number.LowHigh == positionType || number.Color == positionType) <= factorData.HitCount)
+                        factor += factorData.UpgradeFactor;
+                }
+            }
+            return factor;
+        }
+
         private int GetProbabilityUpgradeFactorsOnHit(PositionTypeCategory category, int hitCount)
         {
             List<int> ProbabilityUpgradeFactorOnHit = new List<int>();
@@ -255,24 +271,27 @@ namespace RDeepCore
 
         private void SetBlankGroupUpgradeProbabilities()
         {
-            GroupsUpgradeProbability = new Dictionary<PositionTypeSubCategory, Dictionary<RDeepPosition, float>>();
+            GroupsUpgradeProbability = new Dictionary<PositionType, Dictionary<RDeepPosition, float>>();
 
-            foreach (PositionTypeSubCategory category in Enum.GetValues(typeof(PositionTypeSubCategory)))
+            foreach (PositionType positionType in Enum.GetValues(typeof(PositionType)))
             {
-                GroupsUpgradeProbability.Add(category, GetBlackGroupUpgradeProbabilities());
+                GroupsUpgradeProbability.Add(positionType, GetBlankGroupUpgradeProbabilities(positionType));
             }
         }
 
-        private Dictionary<RDeepPosition, float> GetBlackGroupUpgradeProbabilities()
+        private Dictionary<RDeepPosition, float> GetBlankGroupUpgradeProbabilities(PositionType positionType)
         {
-            Dictionary<RDeepPosition, float> BlackGroupUpgradeProbabilities = new Dictionary<RDeepPosition, float>();
+            Dictionary<RDeepPosition, float> blankGroupUpgradeProbabilities = new Dictionary<RDeepPosition, float>();
 
             foreach(RDeepPosition number in wheelNumbers)
             {
-                BlackGroupUpgradeProbabilities.Add(number, 0);
+                if (positionType == PositionType.Straight)
+                    blankGroupUpgradeProbabilities.Add(number, number.defaultProbability);
+                else
+                    blankGroupUpgradeProbabilities.Add(number, 0);
             }
 
-            return BlackGroupUpgradeProbabilities;
+            return blankGroupUpgradeProbabilities;
         }
 
         private void UpdateProbabilities(List<RDeepPosition> LastNumbers)
@@ -283,13 +302,59 @@ namespace RDeepCore
 
             RDeepPosition currentPos = LastNumbers[LastNumbers.Count - 1];
 
-            foreach(PositionTypeSubCategory category in Enum.GetValues(typeof(PositionTypeSubCategory)))
+            foreach(PositionType positionType in Enum.GetValues(typeof(PositionType)))
             {
-                UpdateProbabilitiesByPosType(category, LastNumbers, currentPos);
+                UpdateProbabilitiesByPosType(positionType, LastNumbers, currentPos);
             }
         }
 
-        private void UpdateProbabilitiesByPosType(PositionTypeSubCategory subCategory, List<RDeepPosition> LastNumbers, RDeepPosition currentPos)
+        private void UpdateProbabilitiesByPosType(PositionType positionType, List<RDeepPosition> LastNumbers, RDeepPosition currentPos)
+        {
+            int HitCount = 1;
+
+            PositionTypeSubCategory subCategory = GetPositonSubCategoryByPositionType(positionType);
+            PositionTypeCategory category = GetPositonTypeCategory(subCategory);
+
+            List<RDeepPosition> fromNumbers = new List<RDeepPosition>();
+            List<RDeepPosition> toNumbers = new List<RDeepPosition>();
+            float UpgradeRate = 0;
+
+            PositionType hitPositionType = GetPositionType(subCategory, currentPos);
+
+            List<RDeepPosition> numbersOfHitType = new List<RDeepPosition>();
+            if (hitPositionType == PositionType.Straight)
+                numbersOfHitType.Add(currentPos);
+            else
+                numbersOfHitType = RDeepPositions.NumbersByPositionType(hitPositionType).ToList();
+
+            List<RDeepPosition> numbersOfNonHitType = wheelNumbers.Except(numbersOfHitType).ToList();
+
+
+            if (positionType == hitPositionType)
+            {
+                // *** On Hit ***
+
+                if (positionType != PositionType.Straight)
+                    HitCount = GetPositionTypeHitCount(subCategory, LastNumbers);
+
+                int Factor = GetProbabilityUpgradeFactorsOnHit(category, HitCount);
+
+                fromNumbers = numbersOfHitType;
+                toNumbers = numbersOfNonHitType;
+
+                float Rate = GetProbabilityUpgradeRate(numbersOfHitType.Count());
+
+                UpgradeRate = Factor * Rate;
+            }
+
+            // *** On Miss ***
+            UpgradeRate += GetProbabilityUpgradeFactorsOnFewerHits(LastNumbers, category, positionType);
+
+            ShiftProbability(fromNumbers, positionType, UpgradeRate);
+            ShiftProbability(toNumbers, positionType, UpgradeRate * -1);
+        }
+
+        private void UpdateProbabilitiesBySubCategory(PositionTypeSubCategory subCategory, List<RDeepPosition> LastNumbers, RDeepPosition currentPos)
         {
             int HitCount = 1;
             if (subCategory != PositionTypeSubCategory.Straight)
@@ -313,14 +378,18 @@ namespace RDeepCore
             ShiftProbability(numbersOfNonHitType, GroupsUpgradeProbability[subCategory], -1 * Factor * Rate);
         }
 
-        private void ShiftProbability(IEnumerable<RDeepPosition> toWheelNumbers, Dictionary<RDeepPosition, float> groupUpgradeProbability, float probability)
+        private void ShiftProbability(IEnumerable<RDeepPosition> toWheelNumbers, PositionType positionType, float probability)
         {
+            Dictionary<RDeepPosition, float> groupUpgradeProbability = GroupsUpgradeProbability[positionType];
 
             float probabilityToAdd = probability / toWheelNumbers.Count();
             foreach (RDeepPosition number in toWheelNumbers)
             {
                 probabilities[number] += probabilityToAdd;
-                groupUpgradeProbability[number] = probabilityToAdd;
+                if (positionType == PositionType.Straight)
+                    groupUpgradeProbability[number] += probabilityToAdd;
+                else
+                    groupUpgradeProbability[number] = probabilityToAdd;
             }
         }
 
@@ -345,7 +414,7 @@ namespace RDeepCore
 
             return result;
         }
-
+        
         private PositionType GetPositionType(PositionTypeSubCategory subCategory, RDeepPosition pos)
         {
             if (subCategory == PositionTypeSubCategory.Color)
@@ -417,6 +486,32 @@ namespace RDeepCore
             }
             else
                 return PositionTypeCategory.Straight;
+        }
+
+        private PositionTypeSubCategory GetPositonSubCategoryByPositionType(PositionType posType)
+        {
+            if (posType == PositionType.Black || posType == PositionType.Red)
+            {
+                return PositionTypeSubCategory.Color;
+            }
+            if (posType == PositionType.Odd || posType == PositionType.Even)
+            {
+                return PositionTypeSubCategory.OddEven;
+            }
+            else if (posType == PositionType.Low || posType == PositionType.High)
+            {
+                return PositionTypeSubCategory.LowHigh;
+            }
+            else if (posType == PositionType.FirstColumn || posType == PositionType.SecondColumn || posType == PositionType.ThirdColumn)
+            {
+                return PositionTypeSubCategory.Column;
+            }
+            else if (posType == PositionType.FirstDozen || posType == PositionType.SecondDozen || posType == PositionType.ThirdDozen)
+            {
+                return PositionTypeSubCategory.Dozen;
+            }
+            else
+                return PositionTypeSubCategory.Straight;
         }
     }
 

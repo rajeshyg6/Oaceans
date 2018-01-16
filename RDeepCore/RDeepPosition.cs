@@ -37,7 +37,8 @@ namespace RDeepCore
         ThirdDozen,
         FirstColumn,
         SecondColumn,
-        ThirdColumn
+        ThirdColumn,
+        Green
     }
 
     public class RDeepPositions
@@ -138,7 +139,7 @@ namespace RDeepCore
         internal static IEnumerable<RDeepPosition> NumbersByPositionType(PositionType positionType)
         {
             List<RDeepPosition> result = new List<RDeepPosition>();
-
+            
             switch (positionType)
             {
                 case PositionType.Straight:
@@ -275,6 +276,7 @@ namespace RDeepCore
         public int ID { get; set; }
         public string Name { get; set; }
         public bool isWheelNumber { get; set; }
+        
         public bool isRed { get; set; }
         public bool isBlack { get; set; }
         public bool isLow { get; set; }
@@ -288,14 +290,26 @@ namespace RDeepCore
         public bool isSecondColumn { get; set; }
         public bool isThirdColumn { get; set; }
         public bool isGreen { get; set; }
+        
+        public PositionType Color { get; set; }
+        public PositionType OddEven { get; set; }
+        public PositionType LowHigh { get; set; }
+        public PositionType Dozen { get; set; }
+        public PositionType Column { get; set; }
+
         public float defaultProbability { get; set; }
 
         public RDeepPosition(int id, string name, bool iswheelnumber)
         {
             ID = id;
             Name = name;
-            isWheelNumber = iswheelnumber;
 
+            if (iswheelnumber)
+            {
+                isWheelNumber = true;
+                Color = OddEven = LowHigh = Dozen = Column = PositionType.Straight;
+            }
+            
             isRed = false;
             isBlack = false;
             isLow = false;
@@ -309,7 +323,6 @@ namespace RDeepCore
             isSecondColumn = false;
             isThirdColumn = false;
             isGreen = false;
-
             SetFlags();
         }
 
@@ -317,58 +330,75 @@ namespace RDeepCore
         {
             if (ID == 0 || ID == 37)
             {
-                isGreen = true;
+                //isGreen = true;
+                Color = OddEven = LowHigh = Dozen = Column = PositionType.Green;
             }
             else
             {
                 if (Convert.ToInt32(ID) >= 1 && Convert.ToInt32(ID) <= 18)
                 {
                     isLow = true;
+                    LowHigh = PositionType.Low;
                 }
                 else if (Convert.ToInt32(ID) >= 19 && Convert.ToInt32(ID) <= 36)
                 {
                     isHigh = true;
+                    LowHigh = PositionType.High;
                 }
 
                 if (Convert.ToInt32(ID) >= 1 && Convert.ToInt32(ID) <= 12)
                 {
                     isFirstDozen = true;
+                    Dozen = PositionType.FirstDozen;
                 }
                 else if (Convert.ToInt32(ID) >= 13 && Convert.ToInt32(ID) <= 24)
                 {
                     isSecondDozen = true;
+                    Dozen = PositionType.SecondDozen;
                 }
                 else if (Convert.ToInt32(ID) >= 25 && Convert.ToInt32(ID) <= 36)
                 {
                     isThirdDozen = true;
+                    Dozen = PositionType.ThirdDozen;
                 }
 
                 if (Convert.ToInt32(ID) % 2 == 0 && isWheelNumber)
                 {
                     isEven = true;
+                    OddEven = PositionType.Even;
                 }
                 else
                 {
                     isOdd = isWheelNumber;
+                    OddEven = PositionType.Odd;
                 }
 
                 if (Convert.ToInt32(ID) % 3 == 0 && isWheelNumber)
                 {
                     isThirdColumn = true;
+                    Column = PositionType.ThirdColumn;
                 }
                 else if (ID == 2 || ID == 5 || ID == 8 || ID == 11 || ID == 14 || ID == 17 || ID == 20 || ID == 23 || ID == 26 || ID == 29 || ID == 32 || ID == 35)
                 {
                     isSecondColumn = true;
+                    Column = PositionType.SecondColumn;
                 }
                 else
                 {
                     isFirstColumn = isWheelNumber;
+                    Column = PositionType.FirstColumn;
                 }
 
                 if (ID == 1 || ID == 3 || ID == 5 || ID == 7 || ID == 9 || ID == 12 || ID == 14 || ID == 16 || ID == 18 || ID == 19 || ID == 21 || ID == 23 || ID == 25 || ID == 27 || ID == 30 || ID == 32 || ID == 34 || ID == 36)
+                {
                     isRed = true;
+                    Color = PositionType.Red;
+                }
                 else
+                {
                     isBlack = isWheelNumber;
+                    Color = PositionType.Black;
+                }
             }
         }
 
