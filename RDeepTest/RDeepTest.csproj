@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Generic\Utilities.csproj">
-      <Project>{73C87917-21A2-4AD9-A3FD-554392382707}</Project>
+      <Project>{73c87917-21a2-4ad9-a3fd-554392382707}</Project>
       <Name>Utilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\Participants\Participants.csproj">

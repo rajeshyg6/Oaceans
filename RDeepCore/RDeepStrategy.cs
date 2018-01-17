@@ -25,7 +25,7 @@ namespace RDeepCore
         string DisplayProbability();
     }
 
-    class BetByTenFifteenStrategy : IRDeepStrategy
+    public class BetByTenFifteenStrategy : IRDeepStrategy
     {
         internal Dictionary<RDeepPosition, float> probabilities;
         Dictionary<PositionTypeCategory, List<int>> probabilityUpgradeFactorsOnHit;
@@ -58,6 +58,8 @@ namespace RDeepCore
             SetBlankGroupUpgradeProbabilities();
 
             SetProbabilityUpgradeFactorsOnHit();
+
+            SetProbabilityUpgradeFactorsOnFewerHits();
         }
 
         public IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<RDeepPosition> LastNumbers)
@@ -112,59 +114,33 @@ namespace RDeepCore
             string result = "";
 
             var probabilitySorted = probabilities.OrderByDescending(pair => pair.Value).Take(probabilities.Count);
-            
+
             foreach (var probability in probabilitySorted)
             {
-                result += DisplayGroupProbability(probability.Key.Name, PositionTypeSubCategory.Straight, probability.Key);
+                result += DisplayGroupProbability(probability.Key.Name, PositionType.Straight, probability.Key);
 
-                if (probability.Key.isGreen)
-                    result += DisplayGroupProbability("[ G]", PositionTypeSubCategory.Color, probability.Key);
-                else if (probability.Key.isRed)
-                    result += DisplayGroupProbability("[ R]", PositionTypeSubCategory.Color, probability.Key);
-                else
-                    result += DisplayGroupProbability("[ B]", PositionTypeSubCategory.Color, probability.Key);
+                result += DisplayGroupProbability("[RD]", PositionType.Red, probability.Key);
+                result += DisplayGroupProbability("[BL]", PositionType.Black, probability.Key);
+                result += DisplayGroupProbability("[LO]", PositionType.Low, probability.Key);
+                result += DisplayGroupProbability("[HI]", PositionType.High, probability.Key);
+                result += DisplayGroupProbability("[OD]", PositionType.Odd, probability.Key);
+                result += DisplayGroupProbability("[EV]", PositionType.Even, probability.Key);
+                result += DisplayGroupProbability("[1D]", PositionType.FirstDozen, probability.Key);
+                result += DisplayGroupProbability("[2D]", PositionType.SecondDozen, probability.Key);
+                result += DisplayGroupProbability("[3D]", PositionType.ThirdDozen, probability.Key);
+                result += DisplayGroupProbability("[1C]", PositionType.FirstColumn, probability.Key);
+                result += DisplayGroupProbability("[2C]", PositionType.SecondColumn, probability.Key);
+                result += DisplayGroupProbability("[3C]", PositionType.ThirdDozen, probability.Key);
 
-                if (probability.Key.isLow)
-                    result += DisplayGroupProbability("[LO]", PositionTypeSubCategory.LowHigh, probability.Key);
-                else if (probability.Key.isHigh)
-                    result += DisplayGroupProbability("[HI]", PositionTypeSubCategory.LowHigh, probability.Key);
-                else
-                    result += DisplayGroupProbability("[ G]", PositionTypeSubCategory.Column, probability.Key);
-
-                if (probability.Key.isOdd)
-                    result += DisplayGroupProbability("[OD]", PositionTypeSubCategory.OddEven, probability.Key);
-                else if (probability.Key.isEven)
-                    result += DisplayGroupProbability("[EV]", PositionTypeSubCategory.OddEven, probability.Key);
-                else
-                    result += DisplayGroupProbability("[ G]", PositionTypeSubCategory.Column, probability.Key);
-
-                if (probability.Key.isFirstDozen)
-                    result += DisplayGroupProbability("[1D]", PositionTypeSubCategory.Dozen, probability.Key);
-                else if (probability.Key.isSecondDozen)
-                    result += DisplayGroupProbability("[2D]", PositionTypeSubCategory.Dozen, probability.Key);
-                else if (probability.Key.isThirdDozen)
-                    result += DisplayGroupProbability("[3D]", PositionTypeSubCategory.Dozen, probability.Key);
-                else
-                    result += DisplayGroupProbability("[ G]", PositionTypeSubCategory.Column, probability.Key);
-                
-                if (probability.Key.isFirstColumn)
-                    result += DisplayGroupProbability("[1C]", PositionTypeSubCategory.Column, probability.Key);
-                else if (probability.Key.isSecondColumn)
-                    result += DisplayGroupProbability("[2C]", PositionTypeSubCategory.Column, probability.Key);
-                else if (probability.Key.isThirdColumn)
-                    result += DisplayGroupProbability("[3C]", PositionTypeSubCategory.Column, probability.Key);
-                else
-                    result += DisplayGroupProbability("[ G]", PositionTypeSubCategory.Column, probability.Key);
-
-                result += string.Format("\tProb: {0:+0.0000;-0.0000}", probability.Value + "\n");
+                result += string.Format("   Total: {0:+0.0000;-0.0000}", probability.Value + "\n");
                 //result += string.Format("\tDefault Probability = {0:0.0000}\n", probability.Key.defaultProbability);
             }
             return result;
         }
 
-        private string DisplayGroupProbability(string posTypeShortName, PositionTypeSubCategory subCategory, RDeepPosition number)
+        private string DisplayGroupProbability(string posTypeShortName, PositionType positionType, RDeepPosition number)
         {
-            string probability = string.Format("{0:+0.0000;-0.0000}", GroupsUpgradeProbability[subCategory][number]);
+            string probability = string.Format("{0:+0.0000;-0.0000}", GroupsUpgradeProbability[positionType][number]);
             return string.Concat(posTypeShortName, ": " , probability + "; ");
         }
 
@@ -223,8 +199,13 @@ namespace RDeepCore
             {
                 if (LastPositions.Count > factorData.SpinCount)
                 {
-                    if (LastPositions.Count(number => number.Column == positionType || number.Dozen == positionType || number.OddEven == positionType || number.LowHigh == positionType || number.Color == positionType) <= factorData.HitCount)
+                    IEnumerable<RDeepPosition> Last_N_Numbers = LastPositions.Take(factorData.SpinCount);
+
+                    if (Last_N_Numbers.Count(number => number.Column == positionType || number.Dozen == positionType || number.OddEven == positionType || number.LowHigh == positionType || number.Color == positionType)
+                        < factorData.HitCount)
+                    {
                         factor += factorData.UpgradeFactor;
+                    }
                 }
             }
             return factor;
@@ -304,20 +285,19 @@ namespace RDeepCore
 
             foreach(PositionType positionType in Enum.GetValues(typeof(PositionType)))
             {
-                UpdateProbabilitiesByPosType(positionType, LastNumbers, currentPos);
+                if (positionType != PositionType.Green)
+                    UpdateProbabilitiesByPosType(positionType, LastNumbers, currentPos);
             }
         }
 
         private void UpdateProbabilitiesByPosType(PositionType positionType, List<RDeepPosition> LastNumbers, RDeepPosition currentPos)
         {
             int HitCount = 1;
+            int Factor = 0;
+            float UpgradeRate = 0;
 
             PositionTypeSubCategory subCategory = GetPositonSubCategoryByPositionType(positionType);
             PositionTypeCategory category = GetPositonTypeCategory(subCategory);
-
-            List<RDeepPosition> fromNumbers = new List<RDeepPosition>();
-            List<RDeepPosition> toNumbers = new List<RDeepPosition>();
-            float UpgradeRate = 0;
 
             PositionType hitPositionType = GetPositionType(subCategory, currentPos);
 
@@ -329,53 +309,24 @@ namespace RDeepCore
 
             List<RDeepPosition> numbersOfNonHitType = wheelNumbers.Except(numbersOfHitType).ToList();
 
-
             if (positionType == hitPositionType)
             {
                 // *** On Hit ***
-
                 if (positionType != PositionType.Straight)
                     HitCount = GetPositionTypeHitCount(subCategory, LastNumbers);
 
-                int Factor = GetProbabilityUpgradeFactorsOnHit(category, HitCount);
+                Factor = GetProbabilityUpgradeFactorsOnHit(category, HitCount);
 
-                fromNumbers = numbersOfHitType;
-                toNumbers = numbersOfNonHitType;
-
-                float Rate = GetProbabilityUpgradeRate(numbersOfHitType.Count());
-
-                UpgradeRate = Factor * Rate;
             }
-
             // *** On Miss ***
-            UpgradeRate += GetProbabilityUpgradeFactorsOnFewerHits(LastNumbers, category, positionType);
+            Factor += GetProbabilityUpgradeFactorsOnFewerHits(LastNumbers, category, positionType);
 
-            ShiftProbability(fromNumbers, positionType, UpgradeRate);
-            ShiftProbability(toNumbers, positionType, UpgradeRate * -1);
-        }
-
-        private void UpdateProbabilitiesBySubCategory(PositionTypeSubCategory subCategory, List<RDeepPosition> LastNumbers, RDeepPosition currentPos)
-        {
-            int HitCount = 1;
-            if (subCategory != PositionTypeSubCategory.Straight)
-                HitCount = GetPositionTypeHitCount(subCategory, LastNumbers);
-
-            PositionTypeCategory Category = GetPositonTypeCategory(subCategory);
-            int Factor = GetProbabilityUpgradeFactorsOnHit(Category, HitCount);
-
-            PositionType hitType = GetPositionType(subCategory, currentPos);
-
-            List<RDeepPosition> numbersOfHitType = new List<RDeepPosition>();
-            if (hitType == PositionType.Straight)
-                numbersOfHitType.Add(currentPos);
-            else
-                numbersOfHitType = RDeepPositions.NumbersByPositionType(hitType).ToList();
-
-            IEnumerable<RDeepPosition> numbersOfNonHitType = wheelNumbers.Except(numbersOfHitType);
             float Rate = GetProbabilityUpgradeRate(numbersOfHitType.Count());
 
-            ShiftProbability(numbersOfHitType, GroupsUpgradeProbability[subCategory], Factor * Rate);
-            ShiftProbability(numbersOfNonHitType, GroupsUpgradeProbability[subCategory], -1 * Factor * Rate);
+            UpgradeRate = Factor * Rate;
+
+            ShiftProbability(numbersOfHitType, positionType, UpgradeRate);
+            ShiftProbability(numbersOfNonHitType, positionType, UpgradeRate * -1);
         }
 
         private void ShiftProbability(IEnumerable<RDeepPosition> toWheelNumbers, PositionType positionType, float probability)

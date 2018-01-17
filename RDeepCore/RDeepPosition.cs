@@ -330,7 +330,7 @@ namespace RDeepCore
         {
             if (ID == 0 || ID == 37)
             {
-                //isGreen = true;
+                isGreen = true;
                 Color = OddEven = LowHigh = Dozen = Column = PositionType.Green;
             }
             else

@@ -4,11 +4,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace RDeepCore.Tests
 {
     [TestClass]
-    public class UnitTest1
+    public class StategyTest
     {
         [TestMethod]
-        public void TestMethod1()
+        public void TestGetProbabilityUpgradeFactorsOnFewerHits()
         {
+            BetByTenFifteenStrategy strategy = new BetByTenFifteenStrategy();
+            
         }
     }
 }

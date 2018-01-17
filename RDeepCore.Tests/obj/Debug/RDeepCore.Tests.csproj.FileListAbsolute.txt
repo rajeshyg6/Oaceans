@@ -10,3 +10,11 @@ C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\RDeepCore.Tests\
 C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\RDeepCore.Tests\obj\Debug\RDeepCore.Tests.csprojResolveAssemblyReference.cache
 C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\RDeepCore.Tests\obj\Debug\RDeepCore.Tests.dll
 C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\RDeepCore.Tests\obj\Debug\RDeepCore.Tests.pdb
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\RDeepCore.Tests\bin\Debug\RouletteCore.dll
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\RDeepCore.Tests\bin\Debug\Participants.dll
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\RDeepCore.Tests\bin\Debug\Monitory.dll
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\RDeepCore.Tests\bin\Debug\Generic.dll
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\RDeepCore.Tests\bin\Debug\RouletteCore.pdb
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\RDeepCore.Tests\bin\Debug\Participants.pdb
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\RDeepCore.Tests\bin\Debug\Monitory.pdb
+C:\Users\Rajesh Y\Documents\Visual Studio 2017\Projects\Oaceans\RDeepCore.Tests\bin\Debug\Generic.pdb
