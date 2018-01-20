@@ -22,7 +22,7 @@ namespace RDeepCore
     interface IRDeepStrategy
     {
         IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<RDeepPosition> LastNumbers);
-        string DisplayProbability();
+        string DisplayProbability(string sortOrder);
     }
 
     public class BetByTenFifteenStrategy : IRDeepStrategy
@@ -109,11 +109,37 @@ namespace RDeepCore
             return result;
         }
 
-        public string DisplayProbability()
+        private void UpdateProbabilitiesFromGroups()
+        {
+            foreach(RDeepPosition number in wheelNumbers)
+            {
+                probabilities[number] = 0;
+                foreach(PositionType positionType in Enum.GetValues(typeof(PositionType)))
+                {
+                    if (positionType == PositionType.Straight)
+                        probabilities[number] += GroupsUpgradeProbability[positionType][number];
+                }
+            }
+        }
+
+        public string DisplayProbability(string sortOrder)
         {
             string result = "";
 
-            var probabilitySorted = probabilities.OrderByDescending(pair => pair.Value).Take(probabilities.Count);
+            IEnumerable<KeyValuePair<RDeepPosition, float>> probabilitySorted;
+
+            if (sortOrder.ToUpper() == "D")
+                probabilitySorted = probabilities.OrderByDescending(pair => pair.Key.Dozen).Take(probabilities.Count);
+            else if (sortOrder.ToUpper() == "C")
+                probabilitySorted = probabilities.OrderByDescending(pair => pair.Key.Column).Take(probabilities.Count);
+            else if (sortOrder.ToUpper() == "E" || sortOrder.ToUpper() == "O")
+                probabilitySorted = probabilities.OrderByDescending(pair => pair.Key.OddEven).Take(probabilities.Count);
+            else if (sortOrder.ToUpper() == "R" || sortOrder.ToUpper() == "B")
+                probabilitySorted = probabilities.OrderByDescending(pair => pair.Key.Color).Take(probabilities.Count);
+            else if (sortOrder.ToUpper() == "L" || sortOrder.ToUpper() == "H")
+                probabilitySorted = probabilities.OrderByDescending(pair => pair.Key.LowHigh).Take(probabilities.Count);
+            else
+                probabilitySorted = probabilities.OrderByDescending(pair => pair.Value).Take(probabilities.Count);
 
             foreach (var probability in probabilitySorted)
             {
@@ -132,7 +158,7 @@ namespace RDeepCore
                 result += DisplayGroupProbability("[2C]", PositionType.SecondColumn, probability.Key);
                 result += DisplayGroupProbability("[3C]", PositionType.ThirdDozen, probability.Key);
 
-                result += string.Format("   Total: {0:+0.0000;-0.0000}", probability.Value + "\n");
+                result += string.Format("   Total: {0:+0.000;-0.000}", probability.Value + "\n");
                 //result += string.Format("\tDefault Probability = {0:0.0000}\n", probability.Key.defaultProbability);
             }
             return result;
@@ -140,7 +166,7 @@ namespace RDeepCore
 
         private string DisplayGroupProbability(string posTypeShortName, PositionType positionType, RDeepPosition number)
         {
-            string probability = string.Format("{0:+0.0000;-0.0000}", GroupsUpgradeProbability[positionType][number]);
+            string probability = string.Format("{0:+0.000;-0.000}", GroupsUpgradeProbability[positionType][number]);
             return string.Concat(posTypeShortName, ": " , probability + "; ");
         }
 
@@ -468,7 +494,7 @@ namespace RDeepCore
 
     class RandomRDeepStrategy : IRDeepStrategy
     {
-        public string DisplayProbability()
+        public string DisplayProbability(string sortOrder)
         {
             return "";// throw new NotImplementedException();
         }

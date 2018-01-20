@@ -104,24 +104,25 @@ namespace RDeepTest
             }
         }
 
-        static void Spin(int value = -1)
+        static void Spin()
         {
             try
             {
-                board.CallForBets();
-                board.Spin(value);
+                //Console.BackgroundColor = ConsoleColor.White;
+                //Console.ForegroundColor = ConsoleColor.Black;
+                Console.WriteLine("\nHit S or 0-37 to spin again.");
 
+                string line = Console.ReadLine();
                 Console.Clear();
-                Console.WriteLine(board.DisplayLastNumbers());
-                Console.WriteLine("\n");
-                Console.WriteLine(board.DisplayPlayersProbabilities());
+
+                board.CallForBets();
 
                 string s = "";
+                s = board.DisplayBoardPlayersCoinsValue();
+                Console.WriteLine(s);
                 //s += board.DisplayBetAndWinningNumbers();
                 //Console.WriteLine(s);
 
-                s = board.DisplayBoardPlayersCoinsValue();
-                Console.WriteLine(s);
                 /*
                 s = board.DisplayBoardInfo();
                 if (s.Contains("MISMATCH"))
@@ -132,23 +133,20 @@ namespace RDeepTest
                 Console.ResetColor();
                 */
 
-                board.ClearBets();
-                Console.WriteLine("\nHit S to spin again.");
-
                 //System.Threading.Thread.Sleep(100);
 
-                string line = Console.ReadLine();
+                int value = -1;
+                int.TryParse(line, out value);
 
-                if (int.TryParse(line, out value))
+                if (line.ToUpper() == "S" || line == "" || (value >= 1 && value <= 37) || line == "0")
                 {
-                    if (value >= 0 && value <= 37)
-                        Spin(value);
+                    board.Spin(value);
+                    board.ClearBets();
                 }
-                else if (line == "X")
-                {
-                    return;
-                }
-                else
+                Console.WriteLine("\n" + board.DisplayLastNumbers());
+                Console.WriteLine("\n" + board.DisplayPlayersProbabilities(line));
+
+                if (line.ToUpper() != "X")
                     Spin();
             }
             catch (Exception e)

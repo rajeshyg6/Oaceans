@@ -194,14 +194,14 @@ namespace RDeepCore
             return result;
         }
 
-        public string DisplayPlayersProbabilities()
+        public string DisplayPlayersProbabilities(string sortOrder)
         {
             string result = "";
 
             foreach (RDeepPlayer player in boardPlayers)
             {
                 result += "\nPlayer: " + player.Name + "\n";
-                result += player.DisplayProbability();
+                result += player.DisplayProbability(sortOrder);
             }
             return result;
         }
