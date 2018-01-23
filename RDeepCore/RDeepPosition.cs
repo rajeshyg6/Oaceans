@@ -47,11 +47,11 @@ namespace RDeepCore
 
         public RDeepPositions()
         {
-            AddrDeepPositions();
+            AddRDeepPositions();
             AssignDefaultProbabilities();
         }
 
-        private static void AddrDeepPositions()
+        private static void AddRDeepPositions()
         {
             rDeepPositions = new List<RDeepPosition>();
             rDeepPositions.Add(RDeepPosition.Zero);

@@ -22,16 +22,19 @@ namespace RDeepCore
     interface IRDeepStrategy
     {
         IEnumerable<RDeepBet> GoForBet(RDeepPlayer player, List<RDeepPosition> LastNumbers);
+
         string DisplayProbability(string sortOrder);
+
+        void UpdateProbabilities(List<RDeepPosition> LastNumbers);
     }
 
     public class BetByTenFifteenStrategy : IRDeepStrategy
     {
-        internal Dictionary<RDeepPosition, float> probabilities;
+        public Dictionary<RDeepPosition, float> probabilities;
         Dictionary<PositionTypeCategory, List<int>> probabilityUpgradeFactorsOnHit;
         Dictionary<PositionTypeCategory, List<UpgradeProbabilityOnFewerHits>> probabilityUpgradeFactorsOnFewerHits;
 
-        Dictionary<PositionType, Dictionary<RDeepPosition, float>> GroupsUpgradeProbability;
+        public Dictionary<PositionType, Dictionary<RDeepPosition, float>> GroupsUpgradeProbability;
 
         class UpgradeProbabilityOnFewerHits
         {
@@ -68,11 +71,12 @@ namespace RDeepCore
                 throw new Exception("Running out of coins!");
 
             List<RDeepBet> result = new List<RDeepBet>();
-
-            UpdateProbabilities(LastNumbers);
-
+            
             RDeepPosition maxProbableNumber = RDeepPosition.Six;
             float maxProbability = maxProbableNumber.defaultProbability;
+
+            if (probabilities.Count < 1)
+                UpdateProbabilities(LastNumbers);
 
             foreach (RDeepPosition number in wheelNumbers)
             {
@@ -90,7 +94,7 @@ namespace RDeepCore
             if (player.coins.Count(coin => coin.isOnBet == false && coin.Value <= 25) < 4)
                 randomTotalCoins = 1;
             else
-                randomTotalCoins = Generic.GetRandomNumber(1, 3);
+                randomTotalCoins = Generic.GetRandomNumber(1, 2);
 
             for (int i = 0; i < randomTotalCoins; i++)
             {
@@ -158,7 +162,7 @@ namespace RDeepCore
                 result += DisplayGroupProbability("[2C]", PositionType.SecondColumn, probability.Key);
                 result += DisplayGroupProbability("[3C]", PositionType.ThirdDozen, probability.Key);
 
-                result += string.Format("   Total: {0:+0.000;-0.000}", probability.Value + "\n");
+                result += string.Format("   Total: {0:+0.00000;-0.00000}", probability.Value + "\n");
                 //result += string.Format("\tDefault Probability = {0:0.0000}\n", probability.Key.defaultProbability);
             }
             return result;
@@ -166,7 +170,7 @@ namespace RDeepCore
 
         private string DisplayGroupProbability(string posTypeShortName, PositionType positionType, RDeepPosition number)
         {
-            string probability = string.Format("{0:+0.000;-0.000}", GroupsUpgradeProbability[positionType][number]);
+            string probability = string.Format("{0:+0.00000;-0.00000}", GroupsUpgradeProbability[positionType][number]);
             return string.Concat(posTypeShortName, ": " , probability + "; ");
         }
 
@@ -187,11 +191,11 @@ namespace RDeepCore
             probabilityUpgradeFactorsOnFewerHits.Add(PositionTypeCategory.Even,
                 new List<UpgradeProbabilityOnFewerHits>
                 {
-                    new UpgradeProbabilityOnFewerHits(10, 1, 2),
-                    new UpgradeProbabilityOnFewerHits(10, 2, 1),
-                    new UpgradeProbabilityOnFewerHits(20, 1, 1),
-                    new UpgradeProbabilityOnFewerHits(20, 2, 1),
-                    new UpgradeProbabilityOnFewerHits(30, 3, 1),
+                    new UpgradeProbabilityOnFewerHits(4, 1, 1),
+                    new UpgradeProbabilityOnFewerHits(4, 2, 1),
+                    new UpgradeProbabilityOnFewerHits(8, 1, 1),
+                    new UpgradeProbabilityOnFewerHits(8, 2, 1),
+                    new UpgradeProbabilityOnFewerHits(12, 3, 1),
                 }
                 );
 
@@ -199,11 +203,11 @@ namespace RDeepCore
             probabilityUpgradeFactorsOnFewerHits.Add(PositionTypeCategory.Third,
                     new List<UpgradeProbabilityOnFewerHits>
                     {
-                        new UpgradeProbabilityOnFewerHits(15, 1, 2),
-                        new UpgradeProbabilityOnFewerHits(15, 2, 1),
-                        new UpgradeProbabilityOnFewerHits(30, 1, 1),
-                        new UpgradeProbabilityOnFewerHits(30, 2, 1),
-                        new UpgradeProbabilityOnFewerHits(45, 3, 1),
+                        new UpgradeProbabilityOnFewerHits(5, 1, 1),
+                        new UpgradeProbabilityOnFewerHits(5, 2, 1),
+                        new UpgradeProbabilityOnFewerHits(10, 1, 1),
+                        new UpgradeProbabilityOnFewerHits(10, 2, 1),
+                        new UpgradeProbabilityOnFewerHits(15, 3, 1),
                     }
                 );
 
@@ -216,25 +220,25 @@ namespace RDeepCore
                 );
         }
 
-        private int GetProbabilityUpgradeFactorsOnFewerHits(List<RDeepPosition> LastPositions, PositionTypeCategory category, PositionType positionType)
+        public int GetProbabilityUpgradeFactorsOnFewerHits(List<RDeepPosition> LastPositions, PositionTypeCategory category, PositionType positionType)
         {
             int factor = 0;
 
             List<UpgradeProbabilityOnFewerHits> upgradeProbabilityOnFewerHits = probabilityUpgradeFactorsOnFewerHits[category];
             foreach(UpgradeProbabilityOnFewerHits factorData in upgradeProbabilityOnFewerHits)
             {
-                if (LastPositions.Count > factorData.SpinCount)
+                if (LastPositions.Count >= factorData.SpinCount)
                 {
-                    IEnumerable<RDeepPosition> Last_N_Numbers = LastPositions.Take(factorData.SpinCount);
+                    IEnumerable<RDeepPosition> Last_N_Numbers = LastPositions.Skip(Math.Max(0, LastPositions.Count() - factorData.SpinCount));
 
                     if (Last_N_Numbers.Count(number => number.Column == positionType || number.Dozen == positionType || number.OddEven == positionType || number.LowHigh == positionType || number.Color == positionType)
-                        < factorData.HitCount)
+                        <= factorData.HitCount)
                     {
                         factor += factorData.UpgradeFactor;
                     }
                 }
             }
-            return factor;
+            return factor * -1;
         }
 
         private int GetProbabilityUpgradeFactorsOnHit(PositionTypeCategory category, int hitCount)
@@ -301,7 +305,7 @@ namespace RDeepCore
             return blankGroupUpgradeProbabilities;
         }
 
-        private void UpdateProbabilities(List<RDeepPosition> LastNumbers)
+        public void UpdateProbabilities(List<RDeepPosition> LastNumbers)
         {
             SetDefaultProbabilities();
 
@@ -341,15 +345,14 @@ namespace RDeepCore
                 if (positionType != PositionType.Straight)
                     HitCount = GetPositionTypeHitCount(subCategory, LastNumbers);
 
-                Factor = GetProbabilityUpgradeFactorsOnHit(category, HitCount);
-
+                //Factor = GetProbabilityUpgradeFactorsOnHit(category, HitCount);
             }
             // *** On Miss ***
             Factor += GetProbabilityUpgradeFactorsOnFewerHits(LastNumbers, category, positionType);
 
             float Rate = GetProbabilityUpgradeRate(numbersOfHitType.Count());
 
-            UpgradeRate = Factor * Rate;
+            UpgradeRate = Factor;// * Rate;
 
             ShiftProbability(numbersOfHitType, positionType, UpgradeRate);
             ShiftProbability(numbersOfNonHitType, positionType, UpgradeRate * -1);
@@ -359,7 +362,7 @@ namespace RDeepCore
         {
             Dictionary<RDeepPosition, float> groupUpgradeProbability = GroupsUpgradeProbability[positionType];
 
-            float probabilityToAdd = probability / toWheelNumbers.Count();
+            float probabilityToAdd = probability;// / toWheelNumbers.Count();
             foreach (RDeepPosition number in toWheelNumbers)
             {
                 probabilities[number] += probabilityToAdd;
@@ -517,7 +520,7 @@ namespace RDeepCore
             if (player.coins.Count < 4)
                 randomTotalCoins = 1;
             else
-                randomTotalCoins = Generic.GetRandomNumber(1, 3);
+                randomTotalCoins = Generic.GetRandomNumber(1, 2);
 
             for (int i = 0; i < randomTotalCoins; i++)
             {
@@ -555,7 +558,7 @@ namespace RDeepCore
                 if (player.coins.Count < 4)
                     randomTotalCoins = 1;
                 else
-                    randomTotalCoins = Generic.GetRandomNumber(1, 3);
+                    randomTotalCoins = Generic.GetRandomNumber(1, 2);
 
                 for (int i = 0; i < randomTotalCoins; i++)
                 {
@@ -578,6 +581,11 @@ namespace RDeepCore
             }
 
             return result;
+        }
+
+        public void UpdateProbabilities(List<RDeepPosition> LastNumbers)
+        {
+
         }
     }
 }

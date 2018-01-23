@@ -30,5 +30,10 @@ namespace RDeepCore
         {
             return RDeepStrategy.GoForBet(this, LastNumbers);
         }
+
+        public void UpgradeProbabilities(List<RDeepPosition> LastNumbers)
+        {
+            RDeepStrategy.UpdateProbabilities(LastNumbers);
+        }
     }
 }

@@ -38,10 +38,10 @@ namespace RDeepCore
 
         private void CallForPlayers()
         {
-            RDeepPlayer RDeepPlayer = new RDeepPlayer("Mr.A", 5000, "Random");
+            RDeepPlayer RDeepPlayer = new RDeepPlayer("Mr.A", 100000, "Random");
             boardPlayers.Add(RDeepPlayer);
 
-            RDeepPlayer RDeepPlayer2 = new RDeepPlayer("Mr.B", 5000, "TenFifteen");
+            RDeepPlayer RDeepPlayer2 = new RDeepPlayer("Mr.B", 100000, "TenFifteen");
             boardPlayers.Add(RDeepPlayer2);
 
             /*
@@ -51,7 +51,7 @@ namespace RDeepCore
             RDeepPlayer RDeepPlayer4 = new RDeepPlayer("Mr.D", 5000);
             boardPlayers.Add(RDeepPlayer4);*/
 
-            boardDealer = new RDeepDealer("Mr. Dealer", 100000);
+            boardDealer = new RDeepDealer("Mr. Dealer", 500000);
 
             //Participant.TransferCoins(RDeepPlayer, dealer, RDeepPlayer.TakeCoins(CoinType.One, 2).ToList());
         }
@@ -93,6 +93,9 @@ namespace RDeepCore
             ValidateBetsForPlayers();
 
             SettleBets();
+
+            foreach (RDeepPlayer player in boardPlayers)
+                player.UpgradeProbabilities(LastNumbers);
         }
 
         private void SettleBets()
@@ -188,8 +191,10 @@ namespace RDeepCore
         {
             string result = "";
 
+            int i = 1;
+
             foreach (RDeepPosition number in LastNumbers)
-                result += number.Name + ", ";
+                result = string.Concat(result, i++.ToString(), ": ", number.Name, ", ");
 
             return result;
         }
