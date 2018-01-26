@@ -238,7 +238,7 @@ namespace RDeepCore
                     }
                 }
             }
-            return factor * -1;
+            return factor;
         }
 
         private int GetProbabilityUpgradeFactorsOnHit(PositionTypeCategory category, int hitCount)
@@ -331,13 +331,13 @@ namespace RDeepCore
 
             PositionType hitPositionType = GetPositionType(subCategory, currentPos);
 
-            List<RDeepPosition> numbersOfHitType = new List<RDeepPosition>();
+            List<RDeepPosition> fromNumbers = new List<RDeepPosition>();
             if (hitPositionType == PositionType.Straight)
-                numbersOfHitType.Add(currentPos);
+                fromNumbers.Add(currentPos);
             else
-                numbersOfHitType = RDeepPositions.NumbersByPositionType(hitPositionType).ToList();
+                fromNumbers = RDeepPositions.NumbersByPositionType(positionType).ToList();
 
-            List<RDeepPosition> numbersOfNonHitType = wheelNumbers.Except(numbersOfHitType).ToList();
+            List<RDeepPosition> toNumbers = wheelNumbers.Except(fromNumbers).ToList();
 
             if (positionType == hitPositionType)
             {
@@ -345,23 +345,26 @@ namespace RDeepCore
                 if (positionType != PositionType.Straight)
                     HitCount = GetPositionTypeHitCount(subCategory, LastNumbers);
 
+                //UNCOMMENT
                 //Factor = GetProbabilityUpgradeFactorsOnHit(category, HitCount);
             }
             // *** On Miss ***
             Factor += GetProbabilityUpgradeFactorsOnFewerHits(LastNumbers, category, positionType);
 
-            float Rate = GetProbabilityUpgradeRate(numbersOfHitType.Count());
+            float Rate = GetProbabilityUpgradeRate(fromNumbers.Count());
 
+            //UNCOMMENT
             UpgradeRate = Factor;// * Rate;
 
-            ShiftProbability(numbersOfHitType, positionType, UpgradeRate);
-            ShiftProbability(numbersOfNonHitType, positionType, UpgradeRate * -1);
+            ShiftProbability(fromNumbers, positionType, UpgradeRate);
+            ShiftProbability(toNumbers, positionType, UpgradeRate * -1);
         }
 
         private void ShiftProbability(IEnumerable<RDeepPosition> toWheelNumbers, PositionType positionType, float probability)
         {
             Dictionary<RDeepPosition, float> groupUpgradeProbability = GroupsUpgradeProbability[positionType];
 
+            //UNCOMMENT
             float probabilityToAdd = probability;// / toWheelNumbers.Count();
             foreach (RDeepPosition number in toWheelNumbers)
             {
