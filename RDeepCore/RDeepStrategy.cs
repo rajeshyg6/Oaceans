@@ -142,8 +142,10 @@ namespace RDeepCore
                 probabilitySorted = probabilities.OrderByDescending(pair => pair.Key.Color).Take(probabilities.Count);
             else if (sortOrder.ToUpper() == "L" || sortOrder.ToUpper() == "H")
                 probabilitySorted = probabilities.OrderByDescending(pair => pair.Key.LowHigh).Take(probabilities.Count);
-            else
+            else if (sortOrder.ToUpper() == "P" || sortOrder.ToUpper() == "R")
                 probabilitySorted = probabilities.OrderByDescending(pair => pair.Value).Take(probabilities.Count);
+            else
+                probabilitySorted = probabilities.OrderByDescending(pair => pair.Key.Name).Take(probabilities.Count);
 
             foreach (var probability in probabilitySorted)
             {
@@ -160,7 +162,7 @@ namespace RDeepCore
                 result += DisplayGroupProbability("[3D]", PositionType.ThirdDozen, probability.Key);
                 result += DisplayGroupProbability("[1C]", PositionType.FirstColumn, probability.Key);
                 result += DisplayGroupProbability("[2C]", PositionType.SecondColumn, probability.Key);
-                result += DisplayGroupProbability("[3C]", PositionType.ThirdDozen, probability.Key);
+                result += DisplayGroupProbability("[3C]", PositionType.ThirdColumn, probability.Key);
 
                 result += string.Format("   Total: {0:+0.00000;-0.00000}", probability.Value + "\n");
                 //result += string.Format("\tDefault Probability = {0:0.0000}\n", probability.Key.defaultProbability);
@@ -191,11 +193,11 @@ namespace RDeepCore
             probabilityUpgradeFactorsOnFewerHits.Add(PositionTypeCategory.Even,
                 new List<UpgradeProbabilityOnFewerHits>
                 {
-                    new UpgradeProbabilityOnFewerHits(4, 1, 1),
-                    new UpgradeProbabilityOnFewerHits(4, 2, 1),
-                    new UpgradeProbabilityOnFewerHits(8, 1, 1),
-                    new UpgradeProbabilityOnFewerHits(8, 2, 1),
-                    new UpgradeProbabilityOnFewerHits(12, 3, 1),
+                    new UpgradeProbabilityOnFewerHits(10, 1, 1),
+                    new UpgradeProbabilityOnFewerHits(10, 2, 1),
+                    new UpgradeProbabilityOnFewerHits(20, 1, 1),
+                    new UpgradeProbabilityOnFewerHits(20, 2, 1),
+                    new UpgradeProbabilityOnFewerHits(30, 3, 1),
                 }
                 );
 
@@ -203,11 +205,11 @@ namespace RDeepCore
             probabilityUpgradeFactorsOnFewerHits.Add(PositionTypeCategory.Third,
                     new List<UpgradeProbabilityOnFewerHits>
                     {
-                        new UpgradeProbabilityOnFewerHits(5, 1, 1),
-                        new UpgradeProbabilityOnFewerHits(5, 2, 1),
-                        new UpgradeProbabilityOnFewerHits(10, 1, 1),
-                        new UpgradeProbabilityOnFewerHits(10, 2, 1),
-                        new UpgradeProbabilityOnFewerHits(15, 3, 1),
+                        new UpgradeProbabilityOnFewerHits(15, 1, 1),
+                        new UpgradeProbabilityOnFewerHits(15, 2, 1),
+                        new UpgradeProbabilityOnFewerHits(30, 1, 1),
+                        new UpgradeProbabilityOnFewerHits(30, 2, 1),
+                        new UpgradeProbabilityOnFewerHits(45, 3, 1),
                     }
                 );
 
@@ -215,7 +217,7 @@ namespace RDeepCore
             probabilityUpgradeFactorsOnFewerHits.Add(PositionTypeCategory.Straight,
                     new List<UpgradeProbabilityOnFewerHits>
                     {
-                        new UpgradeProbabilityOnFewerHits(100, 0, 1)
+                        new UpgradeProbabilityOnFewerHits(90, 0, 1)
                     }
                 );
         }
@@ -345,16 +347,15 @@ namespace RDeepCore
                 if (positionType != PositionType.Straight)
                     HitCount = GetPositionTypeHitCount(subCategory, LastNumbers);
 
-                //UNCOMMENT
-                //Factor = GetProbabilityUpgradeFactorsOnHit(category, HitCount);
+                Factor = GetProbabilityUpgradeFactorsOnHit(category, HitCount);
             }
             // *** On Miss ***
+
             Factor += GetProbabilityUpgradeFactorsOnFewerHits(LastNumbers, category, positionType);
 
             float Rate = GetProbabilityUpgradeRate(fromNumbers.Count());
 
-            //UNCOMMENT
-            UpgradeRate = Factor;// * Rate;
+            UpgradeRate = Factor * Rate;
 
             ShiftProbability(fromNumbers, positionType, UpgradeRate);
             ShiftProbability(toNumbers, positionType, UpgradeRate * -1);
@@ -364,8 +365,7 @@ namespace RDeepCore
         {
             Dictionary<RDeepPosition, float> groupUpgradeProbability = GroupsUpgradeProbability[positionType];
 
-            //UNCOMMENT
-            float probabilityToAdd = probability;// / toWheelNumbers.Count();
+            float probabilityToAdd = probability / toWheelNumbers.Count();
             foreach (RDeepPosition number in toWheelNumbers)
             {
                 probabilities[number] += probabilityToAdd;

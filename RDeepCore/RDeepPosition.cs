@@ -25,6 +25,7 @@ namespace RDeepCore
 
     public enum PositionType
     {
+        Green,
         Straight,
         Red,
         Black,
@@ -37,8 +38,7 @@ namespace RDeepCore
         ThirdDozen,
         FirstColumn,
         SecondColumn,
-        ThirdColumn,
-        Green
+        ThirdColumn
     }
 
     public class RDeepPositions
@@ -389,7 +389,7 @@ namespace RDeepCore
                     Column = PositionType.FirstColumn;
                 }
 
-                if (ID == 1 || ID == 3 || ID == 5 || ID == 7 || ID == 9 || ID == 12 || ID == 14 || ID == 16 || ID == 18 || ID == 19 || ID == 21 || ID == 23 || ID == 25 || ID == 27 || ID == 30 || ID == 32 || ID == 34 || ID == 36)
+                if (ID == 1 || ID == 3 || ID == 5 || ID == 7 || ID == 9 || ID == 12 || ID == 14 || ID == 16 || ID == 18 || ID == 21 || ID == 23 || ID == 25 || ID == 27 || ID == 28 || ID == 30 || ID == 32 || ID == 34 || ID == 36)
                 {
                     isRed = true;
                     Color = PositionType.Red;
